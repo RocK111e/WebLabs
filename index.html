@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
     <title>Document</title>
 </head>
 
 <body>
     <header>
-        <div class="logo">LOGO</div>
+        <div class="right">
+            <button class="burger-btn" onclick="burger_menu()">☰</button>  
+            <div class="logo">LOGO</div>  
+        </div>
         <div class="right">
             <div class="item">BELL</div>
             <div class="item">ACC</div>
         </div>
     </header>
     
-    <div class="container">
-        <aside>
+    <div class="below_header">
+        <aside id="side_bar">
             <nav>
             <ul>
                 <li><a href="#">Dashboard</a></li>
@@ -29,35 +33,37 @@
     
         <main>
             <a> Students </a>
-            <table>
-                <tr>
-                    <th>cb</th>
-                    <th>Group</th>
-                    <th>Name</th>
-                    <th>Gender</th>
-                    <th>Birthday</th>
-                    <th>Status</th>
-                    <th>Options</th>
-                </tr>
-                <tr>
-                    <td>cb</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>cb</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table> 
+            <div class="table_cont">
+                <table>
+                    <tr>
+                        <th>cb</th>
+                        <th>Group</th>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Birthday</th>
+                        <th>Status</th>
+                        <th>Options</th>
+                    </tr>
+                    <tr>
+                        <td>cb</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>cb</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
         </main>
     </div>
 </body>
