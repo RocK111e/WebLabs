@@ -1,0 +1,80 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    margin: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border: 0px;
+    margin: 0px;
+    background-color: #5a4646;
+    position: fixed;
+    width: 100%;
+    height: 40px;
+}
+
+header .logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+header .right {
+    display: flex;
+    gap: 20px;
+}
+
+header .item {
+    padding: 5px 10px;
+    background-color: lightgray;
+}
+
+.container{
+    padding-top: 40px;
+    display: flex;
+}
+aside {
+    width: 150px;
+    background-color: #c60404;
+    padding: 15px;
+    height: 1000px;
+}
+aside ul {
+    list-style: none;
+    padding: 0;
+    position: fixed;
+}
+aside ul li {
+    padding: 10px;
+}
+aside ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+aside ul li a:hover {
+    background-color: #323232;
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+table{
+    width: 90%;
+    min-width: 0px;
+    table-layout: auto;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
