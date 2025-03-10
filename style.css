@@ -94,3 +94,31 @@ table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
 }
+
+@media screen and (max-width: 500px) {
+    .burger-btn {
+        display: block;
+    }
+
+    aside {
+        position: fixed;
+        top: 40px;
+        left: 0;
+        height: 100%;
+        transform: translateX(-100%);
+        z-index: 5;
+    }
+
+    aside.open {
+        transform: translateX(0);
+    }
+
+    .below_header {
+        display: block;
+    }
+
+    main {
+        width: 100%;
+        z-index: 0;
+    }
+}
