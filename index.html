@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="app.js"></script>  <!-- Moved to bottom -->
     <title>Students</title>
 </head>
 <body>
@@ -14,8 +13,8 @@
             <div class="logo">LOGO</div>  
         </div>
         <div class="right">
-            <div class="item">BELL</div>
-            <div class="item">ACC</div>
+            <div class="hd_item">BELL</div>
+            <div class="hd_item">ACC</div>
         </div>
     </header>
     
@@ -35,35 +34,48 @@
             <div class="table_cont">
                 <table>
                     <tr>
-                        <th>cb</th>
+                        <th class="tb_cb"><input type="checkbox" id="main_cb"></th>
                         <th>Group</th>
                         <th>Name</th>
                         <th>Gender</th>
                         <th>Birthday</th>
                         <th>Status</th>
-                        <th>Options</th>
+                        <th class="tb_opt">Options</th>
                     </tr>
                     <tr>
-                        <td>cb</td>
+                        <td><input type="checkbox" class="table_cb"></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
+                        <td>
+                            <div class="opt_but">
+                                <div class="table_but">E</div>
+                                <div class="table_but">D</div>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
-                        <td>cb</td>
+                        <td><input type="checkbox" class="table_cb"></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
+                        <td>
+                            <div class="opt_but">
+                                <div class="table_but">EDIT</div>
+                                <div class="table_but">DELT</div>
+                            </div>
+                        </td>
                     </tr>
                 </table>
             </div>
         </main>
     </div>
 </body>
+
+<script src="app.js"></script>  <!-- Moved to bottom -->
+
 </html>

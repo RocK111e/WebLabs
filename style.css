@@ -29,7 +29,7 @@ header .right {
     gap: 20px;
 }
 
-header .item {
+header .hd_item {
     padding: 5px 10px;
     background-color: lightgray;
 }
@@ -99,6 +99,25 @@ table{
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
+    text-align: center;
+}
+
+.tb_cb{
+    width: 25px;
+    max-width: 25px;
+}
+
+.tb_opt{
+    width: 50px;
+    max-width: 50px;
+}
+
+.opt_but{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    border: 0px;
+    margin: 5px;
 }
 
 @media screen and (max-width: 500px) {
