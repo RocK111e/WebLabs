@@ -47,13 +47,19 @@ header .item {
     cursor: pointer;
 }
 
-aside {
+aside#sidebar {
     width: 150px;
     min-width: 150px;
     background-color: #c60404;
     padding: 15px;
     height: 1000px;
+    transform: translateX(-100%);  /* Hidden by default */
 }
+
+aside#sidebar.open {
+    transform: translateX(0);      /* Shown when open */
+}
+
 aside ul {
     list-style: none;
     padding: 0;
@@ -88,37 +94,21 @@ main{
 table{
     width: 100%;
     table-layout: auto;
-
 }
+
 table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
 }
 
 @media screen and (max-width: 500px) {
-    .burger-btn {
-        display: block;
+    .below_header {
+        display: block;  /* Main takes full width */
     }
-
-    aside {
-        position: fixed;
+    aside#sidebar {
+        position: fixed;  /* Overlaps main content */
         top: 40px;
         left: 0;
-        height: 100%;
-        transform: translateX(-100%);
-        z-index: 5;
-    }
-
-    aside.open {
-        transform: translateX(0);
-    }
-
-    .below_header {
-        display: block;
-    }
-
-    main {
-        width: 100%;
-        z-index: 0;
+        z-index: 1;      /* Ensures sidebar is above main */
     }
 }

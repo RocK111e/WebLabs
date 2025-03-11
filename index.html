@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <script src="app.js"></script>
     <title>Document</title>
 </head>
-
 <body>
     <header>
         <div class="right">
-            <button class="burger-btn" onclick="burger_menu()">☰</button>  
+            <button id="burger-btn" class="burger-btn">☰</button>  
             <div class="logo">LOGO</div>  
         </div>
         <div class="right">
@@ -21,18 +19,18 @@
     </header>
     
     <div class="below_header">
-        <aside id="side_bar">
+        <aside id="sidebar"> 
             <nav>
-            <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Students</a></li>
-                <li><a href="#">Task</a></li>
-            </ul>
+                <ul>
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="#">Students</a></li>
+                    <li><a href="#">Task</a></li>
+                </ul>
             </nav>
         </aside>
     
         <main>
-            <a> Students </a>
+            <a>Students</a>
             <div class="table_cont">
                 <table>
                     <tr>
@@ -66,5 +64,6 @@
             </div>
         </main>
     </div>
+    <script src="app.js"></script>  <!-- Moved to bottom -->
 </body>
 </html>
