@@ -3,9 +3,22 @@ document.addEventListener("DOMContentLoaded", function() {
     bur_but.addEventListener("click", burger_menu);
 
     const main_cb = document.getElementById("main_cb");
-    main_cb.addEventListener("click", function() {
-        toggle(main_cb);
+    if (main_cb) {
+        main_cb.addEventListener("click", function() {
+            update_table_cb(main_cb);
+        });
+    } else {
+        console.error("Main checkbox not found");
+    }
+
+    const tableCheckboxes = document.querySelectorAll(".table_cb"); // Added dot for class
+    console.log("Found table checkboxes:", tableCheckboxes.length);
+    tableCheckboxes.forEach(cb => {
+        cb.addEventListener("change", function() {
+            update_main_cb();
+        });
     });
+
 });
 
 function burger_menu() {
@@ -27,10 +40,24 @@ function burger_menu() {
     }
 }
 
-function toggle(source) {
-    let checkboxes = document.querySelectorAll(".table_cb");
+function update_table_cb(source) {
+    let checkboxes = document.querySelectorAll(".table_cb"); // Consistent class selector
     console.log("Found checkboxes:", checkboxes.length);
-    for(var i=0, n=checkboxes.length;i<n;i++) {
-        checkboxes[i].checked = source.checked;
+    checkboxes.forEach(cb => {
+        cb.checked = source.checked;
+    });
+}
+
+function update_main_cb() {
+    const main_cb = document.getElementById("main_cb");
+    const tableCheckboxes = document.querySelectorAll(".table_cb");
+    
+    if (!main_cb) {
+        console.error("Main checkbox not found in update_main_cb");
+        return;
     }
+
+    console.log("Table checkboxes found:", tableCheckboxes.length);
+    const allChecked = Array.from(tableCheckboxes).every(cb => cb.checked);
+    main_cb.checked = allChecked;
 }
