@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     const bur_but = document.getElementById("burger-btn");
     bur_but.addEventListener("click", burger_menu);
+    
+    
 
     const main_cb = document.getElementById("main_cb");
     if (main_cb) {

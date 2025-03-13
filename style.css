@@ -49,6 +49,7 @@ header .hd_item {
 
 aside#sidebar {
     width: 150px;
+    display: none;
     min-width: 150px;
     background-color: #c60404;
     padding: 15px;
@@ -125,6 +126,7 @@ table, th, td {
         display: block;  /* Main takes full width */
     }
     aside#sidebar {
+        display: none;
         position: fixed;  /* Overlaps main content */
         top: 40px;
         left: 0;
