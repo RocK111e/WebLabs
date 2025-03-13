@@ -81,7 +81,6 @@ function update_main_cb() {
 function open_edit_modal(event) {
     const modal = document.getElementById('edit-modal');
     modal.style.display = 'block';
-    // You can add code here to populate the modal with data 
     const row = event.target.closest('tr');
     console.log('Edit clicked for row:', row);
 }
