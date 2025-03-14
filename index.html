@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="modals.css">
     <title>Students</title>
 </head>
 <body>
@@ -77,12 +78,42 @@
             <!-- Edit Modal -->
             <div id="edit-modal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <span class="close-modal">✕</span>
-                    <h2>Edit Item</h2>
+                    <div class="modal-header">
+                        <h2>Edit student</h2>
+                        <span class="close-btn">&times;</span>
+                    </div>
                     <form>
-                        <!-- Add your form fields here -->
-                        <button type="submit">Save</button>
-                        <button type="button" class="close-modal">Cancel</button>
+                        <div class="form-group">
+                            <label for="group">Group</label>
+                            <select id="group" name="group">
+                                <option value="KN-22">KN-22</option>
+                                <!-- Add more options as needed -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="first-name">First name</label>
+                            <input type="text" id="first-name" name="first-name" value="Ann">
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last name</label>
+                            <input type="text" id="last-name" name="last-name" value="Bond">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <!-- Add more options as needed -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday">Birthday</label>
+                            <input type="date" id="birthday" name="birthday" value="2004-04-24">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="cancel-btn">Cancel</button>
+                            <button type="submit" class="save-btn">Save</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -91,16 +122,12 @@
             <div id="delete-modal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close-modal">✕</span>
-                    <h2>Confirm Delete</h2>
-                    <p>Are you sure you want to delete this item?</p>
-                    <button id="confirmDelete">Yes</button>
-                    <button class="close-modal">No</button>
                 </div>
             </div>
         </main>
     </div>
+    <script src="app.js"></script>  <!-- Moved to bottom -->
 </body>
 
-<script src="app.js"></script>  <!-- Moved to bottom -->
 
 </html>
