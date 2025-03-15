@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 :root{
-    --gray: #4e4a4a;
+    --gray: #4f4f4f;
     --white: #f5f5f5;
     --light-gray: #bdbdbd;
     --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
@@ -61,7 +61,7 @@ aside#sidebar {
     display: none;
     min-width: 150px;
     background-color: var(--light-gray);
-    padding: 15px;
+    padding: 0 15px 15px 15px;
     height: 100vh;
     transform: translateX(-100%);  /* Hidden by default */
     box-shadow: var(--aside-shadow);
@@ -75,17 +75,28 @@ aside ul {
     list-style: none;
     padding: 0;
     position: fixed;
+    width: calc(150px - 30px);
 }
+
 aside ul li {
-    padding: 10px;
+    padding: 10px 0; /* Adjust padding to avoid overlap */
 }
+
 aside ul li a {
+    padding: 10px 0; /* Adjust padding to avoid overlap */
     color: black;
     text-decoration: none;
     display: block;
+    padding: 10px 15px; /* Padding for rectangular shape */
+    background-color: var(--white); /* Button background */
+    border-radius: 4px; /* Optional: Slight rounding for better look */
+    text-align: center; /* Center the text */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
 }
+
 aside ul li a:hover {
-    background-color: #797979ac;
+    background-color: var(--gray); /* Highlight color on hover */
+    color: white; /* Optional: Change text color on hover */
 }
 
 main{
@@ -151,5 +162,8 @@ table, th, td {
         width: 100%;     /* Makes sidebar full width */
         min-width: 100%; /* Ensures minimum width is also full */
         box-shadow: var(--aside-shadow);
+    }
+    aside ul {
+        width: calc(100% - 30px); /* Adjust for full width minus padding on mobile */
     }
 }
