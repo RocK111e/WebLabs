@@ -1,7 +1,13 @@
 *{
     box-sizing: border-box;
 }
-
+:root{
+    --gray: #4e4a4a;
+    --white: #f5f5f5;
+    --light-gray: #bdbdbd;
+    --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
+    --aside-shadow: rgba(0, 0, 0, 0.17) 10px 0px 20px;
+}
 body{
     margin: 0;
     height: 100%;
@@ -15,10 +21,11 @@ header {
     padding: 10px 20px;
     border: 0px;
     margin: 0px;
-    background-color: #5a4646;
+    background-color: var(--gray);
     position: fixed;
     width: 100%;
     height: 40px;
+    box-shadow: var(--header-shadow);
 }
 
 header .logo {
@@ -33,7 +40,7 @@ header .right {
 
 header .hd_item {
     padding: 5px 10px;
-    background-color: lightgray;
+    background-color: var(--light-gray);
 }
 
 .below_header{
@@ -53,10 +60,11 @@ aside#sidebar {
     width: 150px;
     display: none;
     min-width: 150px;
-    background-color: #c60404;
+    background-color: var(--light-gray);
     padding: 15px;
     height: 100vh;
     transform: translateX(-100%);  /* Hidden by default */
+    box-shadow: var(--aside-shadow);
 }
 
 aside#sidebar.open {
@@ -72,12 +80,12 @@ aside ul li {
     padding: 10px;
 }
 aside ul li a {
-    color: white;
+    color: black;
     text-decoration: none;
     display: block;
 }
 aside ul li a:hover {
-    background-color: #323232;
+    background-color: #797979ac;
 }
 
 main{
@@ -140,5 +148,8 @@ table, th, td {
         top: 40px;
         left: 0;
         z-index: 1;      /* Ensures sidebar is above main */
+        width: 100%;     /* Makes sidebar full width */
+        min-width: 100%; /* Ensures minimum width is also full */
+        box-shadow: var(--aside-shadow);
     }
 }
