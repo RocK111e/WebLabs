@@ -11,30 +11,29 @@
 
 .modal-content {
     width: 300px;
-    background: white; /* Changed from ghostwhite to white to match the image */
+    background: var(--white);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 15px; /* Adjusted padding to match the image */
-    border: 1px solid #ccc; /* Added border to match the image */
+    padding: 15px;
+    border: 1px solid #ccc;
     border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Added shadow to match the image */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .close-modal {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    border: 1px solid #ccc; /* Added border around the close button */
-    background: white;
-    font-size: 16px; /* Adjusted size */
-    width: 20px;
-    height: 20px;
+    border: 1px solid #ccc;
+    background: var(--white);
+    font-size: 16px;
+    width: 25px;
+    height: 25px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    border-radius: 4px;
+    margin-left: 10px;
 }
 
 .modal-header {
@@ -43,24 +42,28 @@
     align-items: center;
     padding-bottom: 10px;
     margin-bottom: 20px;
-    border-bottom: none; /* Removed the red border from the previous style */
+    border-bottom: 1px solid #ccc;
 }
 
 .modal-header h2 {
     margin: 0;
-    font-size: 1.2em; /* Adjusted font size to match the image */
+    font-size: 1.2em;
     font-weight: bold;
 }
 
 .form-group {
     margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: normal; /* Labels are not bold in the image */
+    margin-bottom: 0;
+    font-weight: normal;
     font-size: 14px;
+    flex: 0 0 100px;
 }
 
 .form-group input,
@@ -71,20 +74,7 @@
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
-}
-
-/* Style for the select dropdown to match the image */
-.form-group select {
-    appearance: none; /* Remove default dropdown arrow */
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 5px center;
-    background-size: 12px;
-}
-
-/* Style for the date input to match the calendar icon */
-.form-group input[type="date"] {
-    appearance: none;
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"><path d="M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z"/></svg>') no-repeat right 5px center;
-    background-size: 12px;
+    flex: 1;
 }
 
 .modal-footer {
@@ -92,22 +82,24 @@
     justify-content: flex-end;
     gap: 10px;
     margin-top: 20px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
 }
 
 .modal-footer button {
-    padding: 6px 12px; /* Adjusted padding to match the image */
-    border: 1px solid #ccc; /* Added border to match the image */
+    padding: 6px 12px;
+    border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    background-color: white; /* Buttons are white with a border */
+    background-color: var(--white);
     font-size: 14px;
 }
 
 .modal-footer .cancel-btn {
-    background-color: white; /* Ensure Cancel button is white */
+    background-color: var(--white);
 }
 
 .modal-footer .create-btn {
-    background-color: white; /* Ensure Create button is white */
-    color: black; /* Text color to match the image */
+    background-color: var(--white);
+    color: black;
 }

@@ -1,9 +1,10 @@
 *{
     box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
 }
 :root{
-    --gray: #4f4f4f;
-    --white: #f5f5f5;
+    --gray: #606060;
+    --white: #e4e4e4;
     --light-gray: #bdbdbd;
     --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
     --aside-shadow: rgba(0, 0, 0, 0.17) 10px 0px 20px;
@@ -12,6 +13,7 @@ body{
     margin: 0;
     height: 100%;
     overflow-y: hidden;
+    background-color: var(--white);
 }
 
 header {
@@ -29,7 +31,7 @@ header {
 }
 
 header .logo {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: bold;
 }
 
@@ -106,6 +108,48 @@ main{
     width: 100%;
     padding: 20px;
     position: relative;
+}
+
+/* Add these styles to your existing style.css file */
+
+.main-header {
+    display: flex;
+    justify-content: space-between; /* This pushes items to opposite ends */
+    align-items: center;
+    width: 90%;
+    overflow: auto;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    margin-bottom: 20px;
+}
+
+.students-title {
+    margin-left: 0;
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.add-button {
+    margin: 0;
+    width: 25px; /* Fixed width for circular shape */
+    height: 25px; /* Fixed height for circular shape */
+    border-radius: 50%; /* Makes it round */
+    background-color: #898989; /* Grey color */
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-size: 24px; /* Size of the + sign */
+    display: flex;
+    justify-content: center; /* Horizontal centering */
+    align-items: center; /* Vertical centering */
+    text-align: center; /* Fallback for text */
+    padding: 0; /* Removes any padding */
+    vertical-align: middle; /* Additional fallback */
+    position: relative;
+    top: 0; /* Reset any inherited positioning */
+}
+
+.add-button:hover {
+    background-color: var(--gray); /* Darker grey for hover effect */
 }
 
 .table_cont{
