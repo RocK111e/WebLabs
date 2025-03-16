@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", function() {
     main_cb.addEventListener("click", function() {
         update_table_cb(main_cb);
     });
-
     const tableCheckboxes = document.querySelectorAll(".table_cb"); 
     console.log("Found table checkboxes:", tableCheckboxes.length);
     tableCheckboxes.forEach(cb => {
@@ -34,5 +33,4 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', close_modal);
     });
-
 });
