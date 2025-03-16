@@ -101,6 +101,10 @@ aside ul li a:hover {
     color: white; /* Optional: Change text color on hover */
 }
 
+aside ul li a.active {
+    font-weight: bold; /* Optional: makes it stand out more */
+}
+
 main{
     display: flex;
     flex-direction: column;
