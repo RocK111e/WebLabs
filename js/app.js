@@ -37,6 +37,10 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener('click', close_modal);
     });
 
+    document.querySelectorAll('.cancel-but').forEach(btn => {
+        btn.addEventListener('click', close_modal);
+    });
+
     const add_but = document.getElementById('add-but');
     add_but.addEventListener('click', open_add_modal);
 });
