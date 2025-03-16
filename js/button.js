@@ -35,3 +35,9 @@ export function close_modal(event) {
     const modal = event.target.closest('.modal');
     modal.style.display = 'none';
 }
+
+export function open_add_modal(event){
+    const modal = document.getElementById('add-modal');
+    modal.style.display = 'block';
+    console.log('Add Student modal opened');
+}

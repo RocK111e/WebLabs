@@ -33,7 +33,7 @@
         <main>
             <div class="main-header">
                 <a class="students-title">Students</a>
-                <button id="add-btn" class="add-button">+</button>
+                <button id="add-but" class="add-button">+</button>
             </div>
             <div class="table_cont">
                 <table>
@@ -90,23 +90,21 @@
                             <select id="group" name="group">
                                 <option value="PZ-22">PZ-22</option>
                                 <option value="KN-22">KN-22</option>
-                                <!-- Add more options as needed -->
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="first-name">First name</label>
-                            <input type="text" id="first-name" name="first-name" value="Ann">
+                            <input type="text" id="first-name" name="first-name">
                         </div>
                         <div class="form-group">
                             <label for="last-name">Last name</label>
-                            <input type="text" id="last-name" name="last-name" value="Bond">
+                            <input type="text" id="last-name" name="last-name">
                         </div>
                         <div class="form-group">
                             <label for="gender">Gender</label>
                             <select id="gender" name="gender">
                                 <option value="Female">Female</option>
                                 <option value="Male">Male</option>
-                                <!-- Add more options as needed -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -120,7 +118,48 @@
                     </form>
                 </div>
             </div>
-    
+            
+            <div id="add-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Add student</h2>
+                        <span class="close-modal" >&times;</span>
+                    </div>
+                    <form>
+                        <div class="form-group">
+                            <label for="group">Group</label>
+                            <select id="group" name="group">
+                                <option value="PZ-22">PZ-22</option>
+                                <option value="KN-22">KN-22</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="first-name">First name</label>
+                            <input type="text" id="first-name" name="first-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="last-name">Last name</label>
+                            <input type="text" id="last-name" name="last-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender">
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday">Birthday</label>
+                            <input type="date" id="birthday" name="birthday">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="cancel-btn">Cancel</button>
+                            <button type="submit" class="save-btn">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Delete Modal -->
             <div id="delete-modal" class="modal" style="display: none;">
                 <div class="modal-content">

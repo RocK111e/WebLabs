@@ -1,13 +1,17 @@
 import { burger_menu, 
     close_modal,
     open_delete_modal,
-    open_edit_modal } from "./button.js";
+    open_edit_modal,
+    open_add_modal } from "./button.js";
 import { update_table_cb, update_main_cb } from "./checkbox.js";
 
 document.addEventListener("DOMContentLoaded", function() {
+    //Burger menu event listener
     const bur_but = document.getElementById("burger-btn");
     bur_but.addEventListener("click", burger_menu);
     
+
+    //Checkbox event listeners
     const main_cb = document.getElementById("main_cb");
     main_cb.addEventListener("click", function() {
         update_table_cb(main_cb);
@@ -19,8 +23,8 @@ document.addEventListener("DOMContentLoaded", function() {
             update_main_cb();
         });
     });
-
-    // Add event listeners for edit and delete buttons
+    
+    //Modal buttons event listeners
     document.querySelectorAll('.edit-but').forEach(btn => {
         btn.addEventListener('click', open_edit_modal);
     });
@@ -29,8 +33,10 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener('click', open_delete_modal);
     });
 
-    // Close modal when clicking outside or on close button
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', close_modal);
     });
+
+    const add_but = document.getElementById('add-but');
+    add_but.addEventListener('click', open_add_modal);
 });
