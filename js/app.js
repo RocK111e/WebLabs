@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const bellWrapper = document.querySelector('.bell-wrapper');
     
     // Shake bell and red ball on click
-    bellContainer.addEventListener('click', function (e) {
+    bellContainer.addEventListener('contextmenu', function (e) {
         if (bellWrapper.classList.contains('shake')) return;
         bellWrapper.classList.add('shake');
         setTimeout(() => {
