@@ -122,6 +122,14 @@ export function initialize_add_form() {
         const last_name = document.getElementById('add-last-name').value;
         const gender = document.getElementById('add-gender').value;
         const birthday = document.getElementById('add-birthday').value;
+
+        if (!group || !first_name || !last_name || !gender || !birthday) {
+            alert("Please fill in all fields.");
+            const modal = document.getElementById('add-modal');
+            modal.style.display = 'none'; // Close the modal
+            return; // Stop form submission
+        }
+
         add_student_to_table(group, first_name, last_name, gender, birthday);
         const modal = document.getElementById('add-modal');
         close_modal(event); // Use close_modal function
