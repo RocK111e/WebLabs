@@ -157,6 +157,27 @@ main {
     padding: 20px;
 }
 
+.status{
+    display: flex;
+    justify-content: center;
+    border: 0px;
+    margin: 5px;
+}
+
+.online{
+    width: 15px;
+    height: 15px;
+    background-color: rgb(80, 168, 32);
+    border-radius: 50%;
+}
+
+.offline{
+    width: 15px;
+    height: 15px;
+    background-color: rgb(88, 88, 88);
+    border-radius: 50%;
+}
+
 /* Add these styles to your existing style.css file */
 
 .main-header {

@@ -85,7 +85,11 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
         <td>${first_name} ${last_name}</td>
         <td>${gender}</td>
         <td>${birthday}</td>
-        <td>Active</td>
+        <td>
+            <div class="status">
+                <div class="offline"></div>
+            </div>
+        </td>
         <td>
             <div class="opt_but">
                 <button class="edit-but"><img class="edit_img" src="./icons/pencil.png"></button>  
