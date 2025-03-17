@@ -53,4 +53,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Initial update of buttons
     update_buttons();
+
+    // Get the bell container element
+    const bellContainer = document.querySelector('.bell-container');
+
+    // Add click event listener
+    bellContainer.addEventListener('click', function () {
+        // Prevent restarting if already animating
+        if (this.classList.contains('shake')) return;
+
+        // Add shake class to trigger animation
+        this.classList.add('shake');
+
+        // Remove shake class after animation ends (600ms matches your CSS)
+        setTimeout(() => {
+            this.classList.remove('shake');
+        }, 600);
+    });
 });

@@ -36,10 +36,10 @@ header {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: var(--header-icon-size); /* Fixed width */
-    height: var(--header-icon-size); /* Fixed height */
-    font-size: var(--header-icon-size);
-    line-height: var(--header-icon-size);
+    width: 25px; /* Fixed width */
+    height: 25px; /* Fixed height */
+    font-size: 25px;
+    line-height: 25px;
     text-align: center;
     font-family: Arial, sans-serif;
     transition: transform 0.2s ease-in-out;
@@ -49,6 +49,14 @@ header {
 header .logo {
     font-size: 25px;
     font-weight: bold;
+    text-decoration: none;
+}
+
+header .logo_redir {
+    font-size: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    color: black;
 }
 
 header .right {
@@ -231,6 +239,51 @@ table, th, td {
 .delete_img{
     width: var(--table-icon-size);
     height: var(--table-icon-size);
+}
+
+/* Position the bell container and the red ball relative to it */
+/* Position the bell and the red ball */
+.bell-container {
+    position: relative;
+    display: inline-block; /* Bell and ball container */
+}
+
+.bell_img {
+    width: var(--header-icon-size);
+    height: var(--header-icon-size);
+    transition: transform 0.2s ease;
+}
+
+.red-ball {
+    position: absolute;
+    top: 0;     /* Positioning it at the top */
+    right: 0;   /* Positioning it at the right */
+    width: 12px; /* Small size for the red ball */
+    height: 12px;
+    background-color: red;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Optional shadow */
+}
+
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
+    75% { transform: rotate(-10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.shake {
+    animation: shake 0.6s ease-in-out;
+}
+
+.red-ball {
+    top: 4px; 
+    right: 3px;
+    width: 8px; /* Small size */
+    height: 8px;
+    background-color: rgb(200, 29, 29);
+    border-radius: 50%;
 }
 
 @media screen and (max-width: 500px) {

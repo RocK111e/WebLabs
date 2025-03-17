@@ -10,12 +10,19 @@
 <body>
     <header>
         <div class="right">
-            <button id="burger-btn" class="burger-btn">☰</button>  
-            <div class="logo">LOGO</div>  
+            <button id="burger-btn" class="burger-btn">
+                <span class="burger-char">☰</span>
+            </button>  
+            <div class="logo"><a href="index.html" class="logo_redir">CMS</a></div>  
         </div>
         <div class="right">
-            <div class="item">BELL</div>
-            <div class="item">ACC</div>
+            <div class="hd_item"><img class="bell_img" src="./icons/bell.png"></div>
+            <div class="hd_item">
+                <div class="user">
+                    <img class="user_img" src="./icons/user.png">
+                    <div class="user_name">John Doe</div>
+                </div>
+            </div>
         </div>
     </header>
     
@@ -29,8 +36,11 @@
                 </ul>
             </nav>
         </aside>
-        <a>Dashboard</a>
+        
+        <main>
+            <a>Dashboard</a>
+        </main>
     </div>
-    <script src="js/app.js"></script>  <!-- Moved to bottom -->
+    <script type="module" src="js/app.js"></script>  
 </body>
 </html>
