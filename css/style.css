@@ -405,6 +405,26 @@ table, th, td {
     display: block;
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 5px;
+}
+
+.pagination-button {
+    background-color: var(--white);
+    color: black;
+    border: 1px solid black;
+    padding: 3px 6px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+
 /* Shake animation for bell-wrapper */
 @keyframes shake {
     0% { transform: rotate(0deg); }
