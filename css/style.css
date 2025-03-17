@@ -1,17 +1,19 @@
-*{
+* {
     box-sizing: border-box;
     font-family: 'Arial', sans-serif;
 }
-:root{
+
+:root {
     --gray: #606060;
     --white: #e4e4e4;
     --light-gray: #bdbdbd;
     --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
-    --aside-shadow: rgba(0, 0, 0, 0.17) 10px 0px 20px;
+    --aside-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
     --header-icon-size: 28px;
     --table-icon-size: 20px;
 }
-body{
+
+body {
     margin: 0;
     height: 100%;
     overflow-y: hidden;
@@ -22,7 +24,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 0px 20px;
     border: 0px;
     margin: 0px;
     background-color: var(--gray);
@@ -31,6 +33,19 @@ header {
     height: 40px;
     box-shadow: var(--header-shadow);
 }
+
+header .right {
+    padding: 0px 0px;
+    margin: 0px 0px;
+    display: flex;
+    gap: 15px;
+}
+
+header .hd_item {
+    margin: 0px 0px;
+    padding: 0px 0px;
+    max-height: 28px; /* Match the bell image height */
+} 
 
 .burger-char {
     display: inline-flex;
@@ -45,7 +60,6 @@ header {
     transition: transform 0.2s ease-in-out;
 }
 
-
 header .logo {
     font-size: 25px;
     font-weight: bold;
@@ -59,32 +73,23 @@ header .logo_redir {
     color: black;
 }
 
-header .right {
-    display: flex;
-    gap: 15px;
-}
-
-header .hd_item {
-    padding: 5px 0px;
-} 
-
-header .bell_img{
+header .bell_img {
     width: var(--header-icon-size);
     height: var(--header-icon-size);
 }
 
-header .user{
+header .user {
     display: flex;
     gap: 5px;
     align-items: center;
 }
 
-header .user_img{
+header .user_img {
     width: var(--header-icon-size);
     height: var(--header-icon-size);
 }
 
-.below_header{
+.below_header {
     padding-top: 40px;
     display: flex;
 }
@@ -104,12 +109,12 @@ aside#sidebar {
     background-color: var(--light-gray);
     padding: 0 15px 15px 15px;
     height: 100vh;
-    transform: translateX(-100%);  /* Hidden by default */
+    transform: translateX(-100%); /* Hidden by default */
     box-shadow: var(--aside-shadow);
 }
 
 aside#sidebar.open {
-    transform: translateX(0);      /* Shown when open */
+    transform: translateX(0); /* Shown when open */
 }
 
 aside ul {
@@ -144,7 +149,7 @@ aside ul li a.active {
     font-weight: bold; /* Optional: makes it stand out more */
 }
 
-main{
+main {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -189,12 +194,12 @@ main{
     background-color: var(--gray); /* Darker grey for hover effect */
 }
 
-.table_cont{
+.table_cont {
     width: 90%;
     overflow: auto;
 }
 
-table{
+table {
     width: 100%;
     table-layout: auto;
 }
@@ -203,19 +208,20 @@ table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
     text-align: center;
+    padding: 3px 5px;
 }
 
-.tb_cb{
+.tb_cb {
     width: 25px;
     max-width: 25px;
 }
 
-.tb_opt{
+.tb_opt {
     width: 50px;
     max-width: 50px;
 }
 
-.opt_but{
+.opt_but {
     display: flex;
     justify-content: center;
     gap: 5px;
@@ -230,101 +236,185 @@ table, th, td {
     font-size: 18px;
 }
 
-.edit_img{
+.edit_img {
     width: var(--table-icon-size);
     height: var(--table-icon-size);
 }
 
-.delete_img{
+.delete_img {
     width: var(--table-icon-size);
     height: var(--table-icon-size);
 }
 
-/* Position the bell and the red ball */
+.notification-show{
+    position: relative;
+}
+
+/* Position the bell container */
 .bell-container {
     position: relative;
-    display: inline-block; /* Bell and ball container */
+    display: inline-block;
+    max-width: 28px; /* Match the bell image width */
+    max-height: 28px; /* Match the bell image height */
 }
 
+/* Wrapper for bell and red ball */
+.bell-wrapper {
+    position: relative;
+    display: inline-block;
+    margin: 0px 0px;
+    padding: 0px 0px;
+    max-width: 28px; /* Match the bell image width */
+    max-height: 28px; /* Match the bell image height */
+    cursor: pointer; /* Indicate it's interactive */
+}
+
+/* Bell image */
 .bell_img {
     width: var(--header-icon-size);
     height: var(--header-icon-size);
-    transition: transform 0.2s ease;
-    position: relative;
 }
 
+/* Red ball */
 .red-ball {
     position: absolute;
-    top: 0;     /* Positioning it at the top */
-    right: 0;   /* Positioning it at the right */
-    width: 12px; /* Small size for the red ball */
-    height: 12px;
-    background-color: red;
-    border-radius: 50%;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Optional shadow */
-}
-
-.bell-container{
-    display: flex;
-    gap: 10px;
-}
-
-.notification-popup {
-    display: none;
-    position: absolute;
-    top: 10px;
-    right: 0;
-    background: white;
-    border: 1px solid #ccc;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
-    padding: 8px;
-    z-index: 1;
-    width: 200px;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-.bell_img:hover~ .notification-popup,
-.notification-popup:hover {
-    display: block;
-}
-
-@keyframes shake {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(-10deg); }
-    50% { transform: rotate(10deg); }
-    75% { transform: rotate(-10deg); }
-    100% { transform: rotate(0deg); }
-}
-
-.shake {
-    animation: shake 0.6s ease-in-out;
-}
-
-.red-ball {
-    top: 4px; 
+    top: 4px;
     right: 3px;
-    width: 8px; /* Small size */
+    width: 8px;
     height: 8px;
     background-color: rgb(200, 29, 29);
     border-radius: 50%;
 }
 
+/* Notification area */
+.bell-notifications {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    z-index: 10;
+    width: 200px;
+    overflow-y: auto;
+}
+
+
+/* Style each notification item */
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 3px 3px; /* Padding inside each item */
+    border-bottom: 1px solid #eee; /* Separator line */
+    transition: background-color 0.2s ease; /* Smooth hover effect on item */
+}
+
+/* Remove border from the last item */
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+/* Notification icon */
+.notification-icon {
+    width: 24px; /* Slightly smaller than header icons */
+    height: 24px;
+    margin-right: 10px; /* Space between icon and text */
+}
+
+/* Notification content */
+.notification-content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Notification name */
+.notification-name {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333; /* Darker text for name */
+}
+
+/* Notification message */
+.notification-message {
+    font-size: 12px;
+    color: #666; /* Lighter gray for message */
+}
+
+
+.notification-show:hover .bell-notifications {
+    display: block;
+}
+
+.a_wrapper {
+    position: relative;
+    display: inline-block;
+    padding: 5px; /* Increase hoverable area */
+}
+
+.account_menu_modal{
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    z-index: 10;
+    width: 200px;
+    overflow-y: auto;
+}
+
+.aml_option{
+    font-size: 12px;
+    color: #666; /* Lighter gray for message */
+    display: flex;
+    align-items: center;
+    padding: 3px 3px; /* Padding inside each item */
+    border-bottom: 1px solid #eee; /* Separator line */
+    transition: background-color 0.2s ease; /* Smooth hover effect on item */
+}
+
+.a_wrapper:hover .account_menu_modal{
+    display: block;
+}
+
+/* Shake animation for bell-wrapper */
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    50% { transform: rotate(15deg); }
+    75% { transform: rotate(-15deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.bell-wrapper.shake {
+    animation: shake 0.6s ease-in-out;
+}
+
 @media screen and (max-width: 500px) {
     .below_header {
-        display: block;  /* Main takes full width */
+        display: block; /* Main takes full width */
     }
     aside#sidebar {
         display: none;
-        position: fixed;  /* Overlaps main content */
+        position: fixed; /* Overlaps main content */
         top: 40px;
         left: 0;
-        z-index: 1;      /* Ensures sidebar is above main */
-        width: 100%;     /* Makes sidebar full width */
+        z-index: 1; /* Ensures sidebar is above main */
+        width: 100%; /* Makes sidebar full width */
         min-width: 100%; /* Ensures minimum width is also full */
         box-shadow: var(--aside-shadow);
     }
     aside ul {
         width: calc(100% - 30px); /* Adjust for full width minus padding on mobile */
+    }
+
+    .user_name{
+        display: none;
     }
 }

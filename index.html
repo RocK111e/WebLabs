@@ -17,22 +17,39 @@
         </div>
         <div class="right">
             <div class="hd_item">
-                <div class="user-actions">
-                    <img src="./icons/bell.png" alt="Notification Bell" class="bell_img" id='notification-bell'>
-                    <!-- Notification Popup Container -->
-                    <div class="notification-popup">
-                        <ul>
-                            <li>Message 1: Hello World!</li>
-                            <li>Message 2: Postavte maksimum =</li>
-                            <li>Message 3: Message 3.</li>
-                        </ul>
+                <div class="bell-container notification-show">
+                    <div class="bell-wrapper">
+                        <img class="bell_img" src="./icons/bell.png">
+                        <div class="red-ball"></div>
+                    </div>
+                    <div class="bell-notifications">
+                        <div class="notification-item">
+                            <img class="notification-icon" src="./icons/user.png" alt="User Icon">
+                            <div class="notification-content">
+                                <span class="notification-name">John Doe</span>
+                                <span class="notification-message">Submitted assignment</span>
+                            </div>
+                        </div>
+                        <div class="notification-item">
+                            <img class="notification-icon" src="./icons/user.png" alt="User Icon">
+                            <div class="notification-content">
+                                <span class="notification-name">Jane Smith</span>
+                                <span class="notification-message">Requested feedback</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="hd_item">
+            <div class="hd_item a_wrapper">
                 <div class="user">
                     <img class="user_img" src="./icons/user.png">
-                    <div class="user_name">John Doe</div>
+                    <div class="user_name">
+                        <a>John Doe</a>
+                    </div>
+                </div>
+                <div class="account_menu_modal">
+                    <span class="aml_option">Settings</span>
+                    <span class="aml_option">Log out</span>
                 </div>
             </div>
         </div>
