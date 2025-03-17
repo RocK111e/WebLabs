@@ -1,3 +1,5 @@
+import { setup_cb_listeners } from "./checkbox.js";
+
 export function burger_menu() {
     console.log("burger menu clicked");
     var menu = document.getElementById("sidebar");  // The aside element
@@ -36,7 +38,7 @@ export function close_modal(event) {
     modal.style.display = 'none';
 }
 
-export function open_add_modal(event){
+export function open_add_modal(event) {
     const modal = document.getElementById('add-modal');
     modal.style.display = 'block';
     console.log('Add Student modal opened');
@@ -63,9 +65,18 @@ export function addStudentToTable(group, firstName, lastName, gender, birthday) 
             </div>
         </td>
     `;
-    newRow.querySelector('.edit-but').addEventListener('click', open_edit_modal);
-    newRow.querySelector('.delete-but').addEventListener('click', open_delete_modal);
-    console.log("New row added:", newRow);
+
+    // Add event listeners to new row's buttons
+    const newEditBtn = newRow.querySelector('.edit-but');
+    const newDeleteBtn = newRow.querySelector('.delete-but');
+    newEditBtn.addEventListener('click', open_edit_modal);
+    newDeleteBtn.addEventListener('click', open_delete_modal);
+
+    // Setup listeners for all checkboxes, including the new one
+    setup_cb_listeners();
+
+    // Update main_cb state based on the current state of all checkboxes
+    update_main_cb(); // Ensure main_cb reflects the new state
 }
 
 export function initializeAddForm() {
@@ -86,5 +97,9 @@ export function initializeAddForm() {
         const modal = document.getElementById('add-modal');
         modal.style.display = 'none';
         addForm.reset();
+        setup_cb_listeners(); // Optional: Ensures listeners are re-applied
     });
 }
+
+// Import update_main_cb from checkbox.js if not already imported
+import { update_main_cb } from "./checkbox.js";
