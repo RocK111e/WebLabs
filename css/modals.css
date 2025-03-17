@@ -104,14 +104,9 @@
     color: black;
 }
 
-/* Add to css/modals.css if not present */
 .modal-body {
     padding: 15px 0;
     text-align: center;
-}
-
-#delete-name {
-    font-weight: bold;
 }
 
 .confirm-delete {
