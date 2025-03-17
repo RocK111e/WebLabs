@@ -237,23 +237,38 @@ table, th, td {
 }
 
 .tb_opt {
-    width: 50px;
-    max-width: 50px;
+    width: 100px;
+    max-width: 100px;
+    min-width: 100px;
+    text-align: center; /* Ensure table cell content is centered */
 }
 
 .opt_but {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* Center buttons horizontally */
+    align-items: center; /* Center buttons vertically */
     gap: 5px;
     border: 0px;
-    margin: 5px;
+    margin: 5px auto; /* Center the container within the cell */
+    width: 100%; /* Ensure it spans the cell */
+    max-width: 100%; /* Prevent overflow */
 }
 
 .edit-but, .delete-but {
-    border: none;
+    border: 1px solid black;
+    border-radius: 4px;
     background: none;
     cursor: pointer;
     font-size: 18px;
+    width: 30px;
+    height: 30px;
+    display: flex; /* Make buttons flex containers */
+    justify-content: center; /* Center their content (e.g., images) */
+    align-items: center;
+}
+
+.edit-but:hover, .delete-but:hover {
+    background: var(--gray);
 }
 
 .edit_img {
