@@ -93,7 +93,7 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
         <td>
             <div class="opt_but">
                 <button name="Edit button" class="edit-but"><img class="edit_img" src="./icons/pencil.png" alt="Edit button"></button>  
-                <button name="Delete button"class="delete-but"><img class="delete_img" src="./icons/delete.png" alt="Delete button"></button>
+                <button name="Delete button" class="delete-but"><img class="delete_img" src="./icons/delete.png" alt="Delete button"></button>
             </div>
         </td>
     `;
