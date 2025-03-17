@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Students table for CMS">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modals.css">
     <title>Students</title>
@@ -20,7 +21,7 @@
                 <div class="bell-container notification-show">
                     <div class="bell-wrapper">
                         <a href="message.html">
-                            <img class="bell_img" src="./icons/bell.png">
+                            <img class="bell_img" src="./icons/bell.png" alt="Bell Icon">
                             <div class="red-ball"></div>
                         </a>
                     </div>
@@ -44,9 +45,9 @@
             </div>
             <div class="hd_item a_wrapper">
                 <div class="user">
-                    <img class="user_img" src="./icons/user.png">
+                    <img class="user_img" src="./icons/user.png" alt="User Icon">
                     <div class="user_name">
-                        <a>John Doe</a>
+                        <a href="#" class="logo_redir">John Doe</a>
                     </div>
                 </div>
                 <div class="account_menu_modal">
@@ -70,13 +71,13 @@
         
         <main>
             <div class="main-header">
-                <a class="students-title">Students</a>
+                <div class="students-title">Students</div>
                 <button id="add-but" class="add-button">+</button>
             </div>
             <div class="table_cont">
                 <table>
                     <tr>
-                        <th class="tb_cb"><input type="checkbox" id="main_cb"></th>
+                        <th class="tb_cb"><input type="checkbox" id="main_cb" name="checkbox"></th>
                         <th>Group</th>
                         <th>Name</th>
                         <th>Gender</th>
@@ -85,7 +86,7 @@
                         <th class="tb_opt">Options</th>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" class="table_cb"></td>
+                        <td><input type="checkbox" class="table_cb" name="checkbox"></td>
                         <td>PZ-22</td>
                         <td>Roman Kach</td>
                         <td>Male</td>
@@ -97,13 +98,13 @@
                         </td>
                         <td>
                             <div class="opt_but">
-                                <button class="edit-but"><img class="edit_img" src="./icons/pencil.png"></button>  
-                                <button class="delete-but"><img class="delete_img" src="./icons/delete.png"></button>  
+                                <button name="Edit button" class="edit-but"><img class="edit_img" src="./icons/pencil.png" alt="Edit button"></button>  
+                                <button name="Delete button"class="delete-but"><img class="delete_img" src="./icons/delete.png" alt="Delete button"></button>  
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td><input type="checkbox" class="table_cb"></td>
+                        <td><input type="checkbox" class="table_cb" name="checkbox"></td>
                         <td>PZ-21</td>
                         <td>John Smith</td>
                         <td>Male</td>
@@ -115,8 +116,8 @@
                         </td>
                         <td>
                             <div class="opt_but">
-                                <button class="edit-but"><img class="edit_img" src="./icons/pencil.png"></button>  
-                                <button class="delete-but"><img class="delete_img" src="./icons/delete.png"></button>  
+                                <button name="Edit button" class="edit-but"><img class="edit_img" src="./icons/pencil.png" alt="Edit button"></button>  
+                                <button name="Delete button"class="delete-but"><img class="delete_img" src="./icons/delete.png" alt="Delete button"></button>   
                             </div>
                         </td>
                     </tr>
@@ -224,11 +225,11 @@
             </div>
 
             <div class="pagination">
-                <button id="prev-page" class="pagination-button">&laquo; Prev</button>
-                <button id="prev-page" class="pagination-button">1</button>
-                <button id="prev-page" class="pagination-button">2</button>
-                <button id="prev-page" class="pagination-button">3</button>
-                <button id="next-page" class="pagination-button">Next &raquo;</button>
+                <button class="pagination-button">&laquo; Prev</button>
+                <button class="pagination-button">1</button>
+                <button class="pagination-button">2</button>
+                <button class="pagination-button">3</button>
+                <button class="pagination-button">Next &raquo;</button>
             </div>
         </main>
     </div>

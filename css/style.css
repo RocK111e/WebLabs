@@ -4,7 +4,7 @@
 }
 
 :root {
-    --gray: #606060;
+    --gray: #888888;
     --white: #e4e4e4;
     --light-gray: #bdbdbd;
     --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
@@ -67,7 +67,6 @@ header .logo {
 }
 
 header .logo_redir {
-    font-size: 25px;
     font-weight: bold;
     text-decoration: none;
     color: black;
