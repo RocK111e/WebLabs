@@ -8,6 +8,8 @@
     --light-gray: #bdbdbd;
     --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
     --aside-shadow: rgba(0, 0, 0, 0.17) 10px 0px 20px;
+    --header-icon-size: 28px;
+    --table-icon-size: 20px;
 }
 body{
     margin: 0;
@@ -30,6 +32,20 @@ header {
     box-shadow: var(--header-shadow);
 }
 
+.burger-char {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: var(--header-icon-size); /* Fixed width */
+    height: var(--header-icon-size); /* Fixed height */
+    font-size: var(--header-icon-size);
+    line-height: var(--header-icon-size);
+    text-align: center;
+    font-family: Arial, sans-serif;
+    transition: transform 0.2s ease-in-out;
+}
+
+
 header .logo {
     font-size: 25px;
     font-weight: bold;
@@ -37,12 +53,27 @@ header .logo {
 
 header .right {
     display: flex;
-    gap: 20px;
+    gap: 15px;
 }
 
 header .hd_item {
-    padding: 5px 10px;
-    background-color: var(--light-gray);
+    padding: 5px 0px;
+} 
+
+header .bell_img{
+    width: var(--header-icon-size);
+    height: var(--header-icon-size);
+}
+
+header .user{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+header .user_img{
+    width: var(--header-icon-size);
+    height: var(--header-icon-size);
 }
 
 .below_header{
@@ -147,12 +178,7 @@ main{
     align-items: center; /* Vertical centering */
     text-align: center; /* Fallback for text */
     padding: 0; /* Removes any padding */
-    vertical-align: middle; /* Additional fallback */
-    position: relative;
-    top: 0; /* Reset any inherited positioning */
-}
-
-.add-button:hover {
+    vertical-align: middle;
     background-color: var(--gray); /* Darker grey for hover effect */
 }
 
@@ -195,8 +221,18 @@ table, th, td {
     background: none;
     cursor: pointer;
     font-size: 18px;
-    padding: 5px;
 }
+
+.edit_img{
+    width: var(--table-icon-size);
+    height: var(--table-icon-size);
+}
+
+.delete_img{
+    width: var(--table-icon-size);
+    height: var(--table-icon-size);
+}
+
 @media screen and (max-width: 500px) {
     .below_header {
         display: block;  /* Main takes full width */

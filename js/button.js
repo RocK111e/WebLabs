@@ -7,17 +7,17 @@ let current_edited_row = null;
 export function burger_menu() {
     console.log("burger menu clicked");
     var menu = document.getElementById("sidebar");
-    var btn = document.querySelector(".burger-btn");
-    
+    var btnIcon = document.querySelector(".burger-char");
+
     if (menu.classList.contains("open")) {
         menu.classList.remove("open");
         menu.style.display = "none";
-        btn.textContent = "☰";
+        btnIcon.textContent = "☰";  // Use same spacing
     } else {
         menu.classList.add("open");
         menu.style.display = "block";
         menu.style.width = "150px";
-        btn.textContent = "✕";
+        btnIcon.textContent = "✕";  // Ensure same width
     }
 }
 
@@ -211,12 +211,8 @@ export function update_buttons() {
     edit_buttons.forEach(button => {
         if (checked_count !== 1) {
             button.disabled = true;
-            button.style.cursor = 'not-allowed';
-            button.style.opacity = '0.5';
         } else {
             button.disabled = false;
-            button.style.cursor = 'pointer';
-            button.style.opacity = '1';
         }
     });
 
