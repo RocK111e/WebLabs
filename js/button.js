@@ -3,7 +3,6 @@ import { setup_cb_listeners } from "./checkbox.js";
 
 // Store the currently edited or deleted row globally
 let current_edited_row = null;
-let current_deleted_row = null;
 
 export function burger_menu() {
     console.log("burger menu clicked");
@@ -31,9 +30,9 @@ export function open_edit_modal(event) {
     // Populate the form with current row data
     const cells = current_edited_row.cells;
     document.getElementById('edit-group').value = cells[1].textContent; // Group
-    const fullName = cells[2].textContent.split(' ');
-    document.getElementById('edit-first-name').value = fullName[0] || ''; // First Name
-    document.getElementById('edit-last-name').value = fullName[1] || ''; // Last Name
+    const full_name = cells[2].textContent.split(' ');
+    document.getElementById('edit-first-name').value = full_name[0] || ''; // First Name
+    document.getElementById('edit-last-name').value = full_name[1] || ''; // Last Name
     document.getElementById('edit-gender').value = cells[3].textContent; // Gender
     document.getElementById('edit-birthday').value = cells[4].textContent; // Birthday
 }
@@ -41,19 +40,30 @@ export function open_edit_modal(event) {
 export function open_delete_modal(event) {
     const modal = document.getElementById('delete-modal');
     modal.style.display = 'block';
-    current_deleted_row = event.target.closest('tr');
-    console.log('Delete clicked for row:', current_deleted_row);
+    
+    // Get all checked rows
+    const checked_rows = Array.from(document.querySelectorAll('.table_cb:checked'))
+        .map(cb => cb.closest('tr'));
+    
+    if (checked_rows.length === 0) {
+        console.log('No rows selected for deletion');
+        modal.style.display = 'none'; // Close modal if no rows are selected
+        return;
+    }
 
-    // Populate the name to delete
-    const name = current_deleted_row.cells[2].textContent; // Name column
-    document.getElementById('delete-name').textContent = name;
+    // Update the modal with the student's name if only one row is checked
+    if (checked_rows.length === 1) {
+        const student_name = checked_rows[0].cells[2].textContent || 'this student'; // Name column (index 2)
+        document.getElementById('delete-name').textContent = student_name;
+    } else {
+        document.getElementById('delete-name').textContent = `${checked_rows.length} students`;
+    }
 }
 
 export function close_modal(event) {
     const modal = event.target.closest('.modal');
     modal.style.display = 'none';
     current_edited_row = null; // Clear edit reference
-    current_deleted_row = null; // Clear delete reference
 }
 
 export function open_add_modal(event) {
@@ -93,8 +103,10 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
     // Setup listeners for all checkboxes, including the new one
     setup_cb_listeners();
 
-    // Update main_cb state based on the current state of all checkboxes
+    // Update main_cb state and button states
     update_main_cb();
+    update_edit_buttons();
+    update_delete_buttons();
 }
 
 export function initialize_add_form() {
@@ -166,21 +178,65 @@ export function initialize_delete_modal() {
 
     cancel_button.addEventListener('click', function() {
         delete_modal.style.display = 'none';
-        current_deleted_row = null; // Clear the reference
     });
 
     confirm_button.addEventListener('click', function() {
-        if (current_deleted_row) {
-            current_deleted_row.remove(); // Remove the row
-            console.log('Row deleted:', current_deleted_row);
-            // Update checkbox listeners and main_cb state
-            setup_cb_listeners();
-            update_main_cb();
-        } else {
-            console.error("No row selected for deletion");
-        }
+        // Get all checked rows
+        const checked_rows = Array.from(document.querySelectorAll('.table_cb:checked'))
+            .map(cb => cb.closest('tr'));
+        
+        // Delete each checked row
+        checked_rows.forEach(row => {
+            row.remove();
+            console.log('Row deleted:', row);
+        });
+
+        // Update checkbox listeners and main_cb state
+        setup_cb_listeners();
+        update_main_cb();
+
+        // Update button states
+        update_edit_buttons();
+        update_delete_buttons();
+
+        // Close the modal
         delete_modal.style.display = 'none';
-        current_deleted_row = null; // Clear the reference
+    });
+}
+
+// Function to update the disabled state of edit buttons
+export function update_edit_buttons() {
+    const checked_count = document.querySelectorAll('.table_cb:checked').length;
+    const edit_buttons = document.querySelectorAll('.edit-but');
+
+    edit_buttons.forEach(button => {
+        if (checked_count !== 1) {
+            button.disabled = true;
+            button.style.cursor = 'not-allowed';
+            button.style.opacity = '0.5';
+        } else {
+            button.disabled = false;
+            button.style.cursor = 'pointer';
+            button.style.opacity = '1';
+        }
+    });
+}
+
+// Function to update the disabled state of delete buttons
+export function update_delete_buttons() {
+    const checked_count = document.querySelectorAll('.table_cb:checked').length;
+    const delete_buttons = document.querySelectorAll('.delete-but');
+
+    delete_buttons.forEach(button => {
+        if (checked_count === 0) {
+            button.disabled = true;
+            button.style.cursor = 'not-allowed';
+            button.style.opacity = '0.5';
+        } else {
+            button.disabled = false;
+            button.style.cursor = 'pointer';
+            button.style.opacity = '1';
+        }
     });
 }
 

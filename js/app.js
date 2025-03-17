@@ -7,7 +7,9 @@ import {
     open_add_modal,
     initialize_add_form,
     initialize_edit_form,
-    initialize_delete_modal
+    initialize_delete_modal,
+    update_edit_buttons,
+    update_delete_buttons
 } from "./button.js";
 
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
@@ -47,5 +49,9 @@ document.addEventListener("DOMContentLoaded", function() {
     add_btn.addEventListener('click', open_add_modal);
     initialize_add_form();
     initialize_edit_form();
-    initialize_delete_modal(); // Initialize delete modal handler
+    initialize_delete_modal();
+
+    // Initial update of buttons
+    update_edit_buttons();
+    update_delete_buttons();
 });

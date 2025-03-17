@@ -1,10 +1,15 @@
 // checkbox.js
+import { update_edit_buttons, update_delete_buttons } from "./button.js";
+
 export function update_table_cb(source) {
     let checkboxes = document.querySelectorAll(".table_cb"); 
     console.log("Found checkboxes:", checkboxes.length);
     checkboxes.forEach(cb => {
         cb.checked = source.checked;
     });
+    // Update buttons after main_cb changes all table_cb checkboxes
+    update_edit_buttons();
+    update_delete_buttons();
 }
 
 export function update_main_cb() {
@@ -21,7 +26,14 @@ export function setup_cb_listeners() {
     console.log("Setting up listeners for table checkboxes:", table_checkboxes.length);
     
     table_checkboxes.forEach(cb => {
-        cb.removeEventListener('change', update_main_cb);
-        cb.addEventListener('change', update_main_cb);
+        cb.removeEventListener('change', handle_checkbox_change);
+        cb.addEventListener('change', handle_checkbox_change);
     });
+}
+
+// Handle individual table_cb changes
+function handle_checkbox_change() {
+    update_main_cb();
+    update_edit_buttons();
+    update_delete_buttons();
 }
