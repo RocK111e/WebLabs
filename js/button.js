@@ -47,7 +47,7 @@ export function open_delete_modal(event) {
     
     if (checked_rows.length === 0) {
         console.log('No rows selected for deletion');
-        modal.style.display = 'none'; // Close modal if no rows are selected
+        close_modal(event); // Use close_modal function
         return;
     }
 
@@ -105,8 +105,7 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
 
     // Update main_cb state and button states
     update_main_cb();
-    update_edit_buttons();
-    update_delete_buttons();
+    update_buttons();
 }
 
 export function initialize_add_form() {
@@ -125,7 +124,7 @@ export function initialize_add_form() {
         const birthday = document.getElementById('add-birthday').value;
         add_student_to_table(group, first_name, last_name, gender, birthday);
         const modal = document.getElementById('add-modal');
-        modal.style.display = 'none';
+        close_modal(event); // Use close_modal function
         add_form.reset();
         setup_cb_listeners();
     });
@@ -159,8 +158,7 @@ export function initialize_edit_form() {
         }
 
         // Close the modal
-        const modal = document.getElementById('edit-modal');
-        modal.style.display = 'none';
+        close_modal(event); // Use close_modal function
         current_edited_row = null; // Clear the reference
     });
 }
@@ -176,11 +174,11 @@ export function initialize_delete_modal() {
     const cancel_button = delete_modal.querySelector('.cancel-but');
     const confirm_button = delete_modal.querySelector('.confirm-delete');
 
-    cancel_button.addEventListener('click', function() {
-        delete_modal.style.display = 'none';
+    cancel_button.addEventListener('click', function(event) {
+        close_modal(event); // Use close_modal function
     });
 
-    confirm_button.addEventListener('click', function() {
+    confirm_button.addEventListener('click', function(event) {
         // Get all checked rows
         const checked_rows = Array.from(document.querySelectorAll('.table_cb:checked'))
             .map(cb => cb.closest('tr'));
@@ -196,19 +194,20 @@ export function initialize_delete_modal() {
         update_main_cb();
 
         // Update button states
-        update_edit_buttons();
-        update_delete_buttons();
+        update_buttons();
 
         // Close the modal
-        delete_modal.style.display = 'none';
+        close_modal(event); // Use close_modal function
     });
 }
 
-// Function to update the disabled state of edit buttons
-export function update_edit_buttons() {
+// Function to update the disabled state of both edit and delete buttons
+export function update_buttons() {
     const checked_count = document.querySelectorAll('.table_cb:checked').length;
     const edit_buttons = document.querySelectorAll('.edit-but');
+    const delete_buttons = document.querySelectorAll('.delete-but');
 
+    // Update edit buttons
     edit_buttons.forEach(button => {
         if (checked_count !== 1) {
             button.disabled = true;
@@ -220,22 +219,13 @@ export function update_edit_buttons() {
             button.style.opacity = '1';
         }
     });
-}
 
-// Function to update the disabled state of delete buttons
-export function update_delete_buttons() {
-    const checked_count = document.querySelectorAll('.table_cb:checked').length;
-    const delete_buttons = document.querySelectorAll('.delete-but');
-
+    // Update delete buttons
     delete_buttons.forEach(button => {
         if (checked_count === 0) {
             button.disabled = true;
-            button.style.cursor = 'not-allowed';
-            button.style.opacity = '0.5';
         } else {
             button.disabled = false;
-            button.style.cursor = 'pointer';
-            button.style.opacity = '1';
         }
     });
 }

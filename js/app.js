@@ -1,15 +1,14 @@
 // app.js
 import { 
     burger_menu, 
-    close_modal,
     open_delete_modal,
     open_edit_modal,
     open_add_modal,
     initialize_add_form,
     initialize_edit_form,
     initialize_delete_modal,
-    update_edit_buttons,
-    update_delete_buttons
+    update_buttons,
+    close_modal
 } from "./button.js";
 
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
@@ -37,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener('click', open_delete_modal);
     });
 
+    // Close modal event listeners
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', close_modal);
     });
@@ -52,6 +52,5 @@ document.addEventListener("DOMContentLoaded", function() {
     initialize_delete_modal();
 
     // Initial update of buttons
-    update_edit_buttons();
-    update_delete_buttons();
+    update_buttons();
 });
