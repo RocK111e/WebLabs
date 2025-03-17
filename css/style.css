@@ -251,6 +251,7 @@ table, th, td {
     width: var(--header-icon-size);
     height: var(--header-icon-size);
     transition: transform 0.2s ease;
+    position: relative;
 }
 
 .red-ball {
@@ -263,16 +264,13 @@ table, th, td {
     border-radius: 50%;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3); /* Optional shadow */
 }
-.notification-menu{
-    position: relative;
-}
 
 .bell-container{
     display: flex;
     gap: 10px;
 }
 
-.notification-modal {
+.notification-popup {
     display: none;
     position: absolute;
     top: 10px;
@@ -281,13 +279,14 @@ table, th, td {
     border: 1px solid #ccc;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
     padding: 8px;
-    z-index: 1000;
+    z-index: 1;
     width: 200px;
     max-height: 150px;
     overflow-y: auto;
 }
 
-.notification-menu:hover .notification-modal {
+.bell_img:hover~ .notification-popup,
+.notification-popup:hover {
     display: block;
 }
 
