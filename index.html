@@ -163,7 +163,17 @@
             <!-- Delete Modal -->
             <div id="delete-modal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <span class="close-modal">✕</span>
+                    <div class="modal-header">
+                        <h2>Warning</h2>
+                        <span class="close-modal">×</span>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete <span id="delete-name"></span>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="cancel-but">Cancel</button>
+                        <button type="button" class="confirm-delete">OK</button>
+                    </div>
                 </div>
             </div>
         </main>

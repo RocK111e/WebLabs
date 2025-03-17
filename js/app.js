@@ -1,10 +1,13 @@
+// app.js
 import { 
     burger_menu, 
     close_modal,
     open_delete_modal,
     open_edit_modal,
     open_add_modal,
-    initializeAddForm,
+    initialize_add_form,
+    initialize_edit_form,
+    initialize_delete_modal
 } from "./button.js";
 
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
@@ -42,5 +45,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const add_btn = document.getElementById('add-but');
     add_btn.addEventListener('click', open_add_modal);
-    initializeAddForm();
+    initialize_add_form();
+    initialize_edit_form();
+    initialize_delete_modal(); // Initialize delete modal handler
 });
