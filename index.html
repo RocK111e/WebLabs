@@ -82,34 +82,34 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Edit student</h2>
-                        <span class="close-modal" >&times;</span>
+                        <span class="close-modal">×</span>
                     </div>
-                    <form>
+                    <form id="edit-form"> <!-- Optional: Add a unique ID -->
                         <div class="form-group">
-                            <label for="group">Group</label>
-                            <select id="group" name="group">
+                            <label for="edit-group">Group</label>
+                            <select id="edit-group" name="group">
                                 <option value="PZ-22">PZ-22</option>
                                 <option value="KN-22">KN-22</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="first-name">First name</label>
-                            <input type="text" id="first-name" name="first-name">
+                            <label for="edit-first-name">First name</label>
+                            <input type="text" id="edit-first-name" name="first-name">
                         </div>
                         <div class="form-group">
-                            <label for="last-name">Last name</label>
-                            <input type="text" id="last-name" name="last-name">
+                            <label for="edit-last-name">Last name</label>
+                            <input type="text" id="edit-last-name" name="last-name">
                         </div>
                         <div class="form-group">
-                            <label for="gender">Gender</label>
-                            <select id="gender" name="gender">
-                                <option value="Female">Female</option>
+                            <label for="edit-gender">Gender</label>
+                            <select id="edit-gender" name="gender">
                                 <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="birthday">Birthday</label>
-                            <input type="date" id="birthday" name="birthday" value="2004-04-24">
+                            <label for="edit-birthday">Birthday</label>
+                            <input type="date" id="edit-birthday" name="birthday" value="2004-04-24">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="cancel-but">Cancel</button>
@@ -123,34 +123,34 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Add student</h2>
-                        <span class="close-modal" >&times;</span>
+                        <span class="close-modal">×</span>
                     </div>
-                    <form>
+                    <form id="add-form"> <!-- Add this ID -->
                         <div class="form-group">
-                            <label for="group">Group</label>
-                            <select id="group" name="group">
+                            <label for="add-group">Group</label> <!-- Unique ID for add modal -->
+                            <select id="add-group" name="group">
                                 <option value="PZ-22">PZ-22</option>
                                 <option value="KN-22">KN-22</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="first-name">First name</label>
-                            <input type="text" id="first-name" name="first-name">
+                            <label for="add-first-name">First name</label>
+                            <input type="text" id="add-first-name" name="first-name">
                         </div>
                         <div class="form-group">
-                            <label for="last-name">Last name</label>
-                            <input type="text" id="last-name" name="last-name">
+                            <label for="add-last-name">Last name</label>
+                            <input type="text" id="add-last-name" name="last-name">
                         </div>
                         <div class="form-group">
-                            <label for="gender">Gender</label>
-                            <select id="gender" name="gender">
-                                <option value="Female">Female</option>
+                            <label for="add-gender">Gender</label>
+                            <select id="add-gender" name="gender">
                                 <option value="Male">Male</option>
+                                <option value="Female">Female</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="birthday">Birthday</label>
-                            <input type="date" id="birthday" name="birthday">
+                            <label for="add-birthday">Birthday</label>
+                            <input type="date" id="add-birthday" name="birthday">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="cancel-but">Cancel</button>

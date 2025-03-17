@@ -1,8 +1,11 @@
-import { burger_menu, 
+import { 
+    burger_menu, 
     close_modal,
     open_delete_modal,
     open_edit_modal,
-    open_add_modal } from "./button.js";
+    open_add_modal,
+    initializeAddForm
+} from "./button.js";
 import { update_table_cb, update_main_cb } from "./checkbox.js";
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -41,6 +44,9 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener('click', close_modal);
     });
 
-    const add_but = document.getElementById('add-but');
-    add_but.addEventListener('click', open_add_modal);
+    const add_btn = document.getElementById('add-but');
+    add_btn.addEventListener('click', open_add_modal);
+    initializeAddForm(); 
+
+
 });
