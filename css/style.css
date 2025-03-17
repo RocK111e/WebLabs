@@ -297,7 +297,7 @@ table, th, td {
     border-radius: 4px;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
     padding: 5px;
-    z-index: 1000;
+    z-index: 10;
     width: 200px;
     overflow-y: auto;
 }
@@ -345,6 +345,41 @@ table, th, td {
 
 
 .notification-show:hover .bell-notifications {
+    display: block;
+}
+
+.a_wrapper {
+    position: relative;
+    display: inline-block;
+    padding: 5px; /* Increase hoverable area */
+}
+
+.account_menu_modal{
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    z-index: 10;
+    width: 200px;
+    overflow-y: auto;
+}
+
+.aml_option{
+    font-size: 12px;
+    color: #666; /* Lighter gray for message */
+    display: flex;
+    align-items: center;
+    padding: 3px 3px; /* Padding inside each item */
+    border-bottom: 1px solid #eee; /* Separator line */
+    transition: background-color 0.2s ease; /* Smooth hover effect on item */
+}
+
+.a_wrapper:hover .account_menu_modal{
     display: block;
 }
 
