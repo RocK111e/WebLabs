@@ -44,15 +44,15 @@ header .right {
 header .hd_item {
     margin: 0px 0px;
     padding: 0px 0px;
-    max-height: 28px; /* Match the bell image height */
+    max-height: 28px; 
 } 
 
 .burger-char {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 25px; /* Fixed width */
-    height: 25px; /* Fixed height */
+    width: 25px;
+    height: 25px;
     font-size: 25px;
     line-height: 25px;
     text-align: center;
@@ -108,12 +108,12 @@ aside#sidebar {
     background-color: var(--light-gray);
     padding: 0 15px 15px 15px;
     height: 100vh;
-    transform: translateX(-100%); /* Hidden by default */
+    transform: translateX(-100%);
     box-shadow: var(--aside-shadow);
 }
 
 aside#sidebar.open {
-    transform: translateX(0); /* Shown when open */
+    transform: translateX(0);
 }
 
 aside ul {
@@ -124,28 +124,28 @@ aside ul {
 }
 
 aside ul li {
-    padding: 10px 0; /* Adjust padding to avoid overlap */
+    padding: 10px 0; 
 }
 
 aside ul li a {
-    padding: 10px 0; /* Adjust padding to avoid overlap */
+    padding: 10px 0; 
     color: black;
     text-decoration: none;
     display: block;
-    padding: 10px 15px; /* Padding for rectangular shape */
-    background-color: var(--white); /* Button background */
-    border-radius: 4px; /* Optional: Slight rounding for better look */
-    text-align: center; /* Center the text */
-    transition: background-color 0.3s ease; /* Smooth hover transition */
+    padding: 10px 15px; 
+    background-color: var(--white); 
+    border-radius: 4px; 
+    text-align: center; 
+    transition: background-color 0.3s ease; 
 }
 
 aside ul li a:hover {
-    background-color: var(--gray); /* Highlight color on hover */
-    color: white; /* Optional: Change text color on hover */
+    background-color: var(--gray);
+    color: white; 
 }
 
 aside ul li a.active {
-    font-weight: bold; /* Optional: makes it stand out more */
+    font-weight: bold;
 }
 
 main {
@@ -177,15 +177,13 @@ main {
     border-radius: 50%;
 }
 
-/* Add these styles to your existing style.css file */
-
 .main-header {
     display: flex;
-    justify-content: space-between; /* This pushes items to opposite ends */
+    justify-content: space-between; 
     align-items: center;
     width: 90%;
     overflow: auto;
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
+    box-sizing: border-box;
     margin-bottom: 20px;
 }
 
@@ -197,19 +195,19 @@ main {
 
 .add-button {
     margin: 0;
-    width: 25px; /* Fixed width for circular shape */
-    height: 25px; /* Fixed height for circular shape */
-    border-radius: 50%; /* Makes it round */
-    background-color: #656565; /* Grey color */
+    width: 25px; 
+    height: 25px; 
+    border-radius: 50%; 
+    background-color: #656565;
     color: var(--white);
     border: none;
     cursor: pointer;
-    font-size: 24px; /* Size of the + sign */
+    font-size: 24px; 
     display: flex;
-    justify-content: center; /* Horizontal centering */
-    align-items: center; /* Vertical centering */
-    text-align: center; /* Fallback for text */
-    padding: 0; /* Removes any padding */
+    justify-content: center;
+    align-items: center; 
+    text-align: center; 
+    padding: 0;
     vertical-align: middle;
 }
 
@@ -234,18 +232,18 @@ table, th, td {
     width: 100px;
     max-width: 100px;
     min-width: 100px;
-    text-align: center; /* Ensure table cell content is centered */
+    text-align: center; 
 }
 
 .opt_but {
     display: flex;
-    justify-content: center; /* Center buttons horizontally */
-    align-items: center; /* Center buttons vertically */
+    justify-content: center;
+    align-items: center; 
     gap: 5px;
     border: 0px;
-    margin: 5px auto; /* Center the container within the cell */
-    width: 100%; /* Ensure it spans the cell */
-    max-width: 100%; /* Prevent overflow */
+    margin: 5px auto;
+    width: 100%; 
+    max-width: 100%; 
 }
 
 .edit-but, .delete-but {
@@ -256,8 +254,8 @@ table, th, td {
     font-size: 18px;
     width: 30px;
     height: 30px;
-    display: flex; /* Make buttons flex containers */
-    justify-content: center; /* Center their content (e.g., images) */
+    display: flex; 
+    justify-content: center; 
     align-items: center;
 }
 
@@ -279,32 +277,28 @@ table, th, td {
     position: relative;
 }
 
-/* Position the bell container */
 .bell-container {
     position: relative;
     display: inline-block;
-    max-width: 28px; /* Match the bell image width */
-    max-height: 28px; /* Match the bell image height */
+    max-width: 28px; 
+    max-height: 28px; 
 }
 
-/* Wrapper for bell and red ball */
 .bell-wrapper {
     position: relative;
     display: inline-block;
     margin: 0px 0px;
     padding: 0px 0px;
-    max-width: 28px; /* Match the bell image width */
-    max-height: 28px; /* Match the bell image height */
-    cursor: pointer; /* Indicate it's interactive */
+    max-width: 28px; 
+    max-height: 28px; 
+    cursor: pointer; 
 }
 
-/* Bell image */
 .bell_img {
     width: var(--header-icon-size);
     height: var(--header-icon-size);
 }
 
-/* Red ball */
 .red-ball {
     position: absolute;
     top: 4px;
@@ -315,7 +309,6 @@ table, th, td {
     border-radius: 50%;
 }
 
-/* Notification area */
 .bell-notifications {
     display: none;
     position: absolute;
@@ -332,44 +325,38 @@ table, th, td {
 }
 
 
-/* Style each notification item */
 .notification-item {
     display: flex;
     align-items: center;
-    padding: 3px 3px; /* Padding inside each item */
-    border-bottom: 1px solid #eee; /* Separator line */
-    transition: background-color 0.2s ease; /* Smooth hover effect on item */
+    padding: 3px 3px; 
+    border-bottom: 1px solid #eee; 
+    transition: background-color 0.2s ease; 
 }
 
-/* Remove border from the last item */
 .notification-item:last-child {
     border-bottom: none;
 }
 
-/* Notification icon */
 .notification-icon {
-    width: 24px; /* Slightly smaller than header icons */
+    width: 24px;
     height: 24px;
-    margin-right: 10px; /* Space between icon and text */
+    margin-right: 10px; 
 }
 
-/* Notification content */
 .notification-content {
     display: flex;
     flex-direction: column;
 }
 
-/* Notification name */
 .notification-name {
     font-weight: bold;
     font-size: 14px;
-    color: #333; /* Darker text for name */
+    color: #333; 
 }
 
-/* Notification message */
 .notification-message {
     font-size: 12px;
-    color: #666; /* Lighter gray for message */
+    color: #666;
 }
 
 
@@ -380,7 +367,7 @@ table, th, td {
 .a_wrapper {
     position: relative;
     display: inline-block;
-    padding: 5px; /* Increase hoverable area */
+    padding: 5px;
 }
 
 .account_menu_modal{
@@ -401,12 +388,12 @@ table, th, td {
 .aml_option{
     font-weight: bold;
     font-size: 14px;
-    color: #333; /* Darker text for name */
+    color: #333;
     display: flex;
     align-items: center;
-    padding: 3px 3px; /* Padding inside each item */
-    border-bottom: 1px solid #eee; /* Separator line */
-    transition: background-color 0.2s ease; /* Smooth hover effect on item */
+    padding: 3px 3px; 
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
 }
 
 .a_wrapper:hover .account_menu_modal{
@@ -433,7 +420,6 @@ table, th, td {
 }
 
 
-/* Shake animation for bell-wrapper */
 @keyframes shake {
     0% { transform: rotate(0deg); }
     25% { transform: rotate(-15deg); }
@@ -448,20 +434,20 @@ table, th, td {
 
 @media screen and (max-width: 500px) {
     .below_header {
-        display: block; /* Main takes full width */
+        display: block; 
     }
     aside#sidebar {
         display: none;
-        position: fixed; /* Overlaps main content */
+        position: fixed; 
         top: 40px;
         left: 0;
-        z-index: 1; /* Ensures sidebar is above main */
-        width: 100%; /* Makes sidebar full width */
-        min-width: 100%; /* Ensures minimum width is also full */
+        z-index: 1;
+        width: 100%;
+        min-width: 100%; 
         box-shadow: var(--aside-shadow);
     }
     aside ul {
-        width: calc(100% - 30px); /* Adjust for full width minus padding on mobile */
+        width: calc(100% - 30px);
     }
 
     .user_name{
