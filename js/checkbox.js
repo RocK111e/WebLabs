@@ -1,4 +1,3 @@
-// checkbox.js
 import { update_buttons } from "./button.js";
 
 export function update_table_cb(source) {
@@ -7,7 +6,6 @@ export function update_table_cb(source) {
     checkboxes.forEach(cb => {
         cb.checked = source.checked;
     });
-    // Update buttons after main_cb changes all table_cb checkboxes
     update_buttons();
 }
 
@@ -30,7 +28,6 @@ export function setup_cb_listeners() {
     });
 }
 
-// Handle individual table_cb changes
 function handle_checkbox_change() {
     update_main_cb();
     update_buttons();

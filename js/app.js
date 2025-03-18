@@ -1,4 +1,3 @@
-// app.js
 import { 
     burger_menu, 
     open_delete_modal,
@@ -14,20 +13,16 @@ import {
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
 
 document.addEventListener("DOMContentLoaded", function() {
-    // Burger menu event listener
     const bur_but = document.getElementById("burger-btn");
     bur_but.addEventListener("click", burger_menu);
 
-    // Checkbox event listeners
     const main_cb = document.getElementById("main_cb");
     main_cb.addEventListener("click", function() {
         update_table_cb(main_cb);
     });
 
-    // Setup listeners for table checkboxes on page load
     setup_cb_listeners();
     
-    // Modal buttons event listeners
     document.querySelectorAll('.edit-but').forEach(btn => {
         btn.addEventListener('click', open_edit_modal);
     });
@@ -36,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function() {
         btn.addEventListener('click', open_delete_modal);
     });
 
-    // Close modal event listeners
     document.querySelectorAll('.close-modal').forEach(btn => {
         btn.addEventListener('click', close_modal);
     });
@@ -51,13 +45,11 @@ document.addEventListener("DOMContentLoaded", function() {
     initialize_edit_form();
     initialize_delete_modal();
 
-    // Initial update of buttons
     update_buttons();
 
     const bellContainer = document.querySelector('.bell-container');
     const bellWrapper = document.querySelector('.bell-wrapper');
-    
-    // Shake bell and red ball on click
+
     bellContainer.addEventListener('contextmenu', function (e) {
         if (bellWrapper.classList.contains('shake')) return;
         bellWrapper.classList.add('shake');
