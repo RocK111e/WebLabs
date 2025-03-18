@@ -200,7 +200,7 @@ main {
     width: 25px; /* Fixed width for circular shape */
     height: 25px; /* Fixed height for circular shape */
     border-radius: 50%; /* Makes it round */
-    background-color: #898989; /* Grey color */
+    background-color: #656565; /* Grey color */
     color: var(--white);
     border: none;
     cursor: pointer;
@@ -211,7 +211,6 @@ main {
     text-align: center; /* Fallback for text */
     padding: 0; /* Removes any padding */
     vertical-align: middle;
-    background-color: var(--gray); /* Darker grey for hover effect */
 }
 
 .table_cont {
@@ -229,11 +228,6 @@ table, th, td {
     border-collapse: collapse;
     text-align: center;
     padding: 3px 5px;
-}
-
-.tb_cb {
-    width: 25px;
-    max-width: 25px;
 }
 
 .tb_opt {
