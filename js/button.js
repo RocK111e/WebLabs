@@ -76,7 +76,11 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
     const new_row = table.insertRow(-1);
     new_row.innerHTML = `
         <td>
-            <input type="checkbox" class="table_cb" name="checkbox">
+            <label>
+                <input type="checkbox" class="table_cb" name="checkbox">
+                    Select
+                </input>
+            </label>
         </td>
         <td>${group}</td>
         <td>${first_name} ${last_name}</td>
