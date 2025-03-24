@@ -57,4 +57,11 @@ document.addEventListener("DOMContentLoaded", function() {
             bellWrapper.classList.remove('shake');
         }, 600);
     });
+
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("js/sw.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch((err) => console.error("Service Worker registration failed", err));
+      }
 });
