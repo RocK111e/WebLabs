@@ -11,10 +11,10 @@ const ASSETS = [
     "/icons/pencil.png",
     "/icons/user.png",
     "/icons/icon512.png",
-    "/js/app.js",
+    "/app.js",
+    "/sw.js",
     "/js/button.js",
     "/js/checkbox.js",
-    "/js/sw.js",
     "/json/manifest.json",
 ];
 
