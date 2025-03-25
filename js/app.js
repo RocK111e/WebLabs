@@ -60,8 +60,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker
-          .register("/js/sw.js")
-          .then(() => console.log("Service Worker registered"))
-          .catch((err) => console.error("Service Worker registration failed", err));
-      }
+            .register(("js/sw.js", { scope: "/" }))
+            .then(() => console.log("Service Worker registered"))
+            .catch((err) => console.error("Service Worker registration failed", err));
+    }
 });
