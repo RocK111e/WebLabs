@@ -1,21 +1,21 @@
-const CACHE_NAME = "pwa-cache-v2";
+const CACHE_NAME = "pwa-cache-v4";
 const ASSETS = [
-    "/index.html",
-    "/dashboard.html",
-    "/task.html",
-    "/message.html",
-    "/css/style.css",
-    "/css/modals.css",
-    "/icons/bell.png",
-    "/icons/delete.png",
-    "/icons/pencil.png",
-    "/icons/user.png",
-    "/icons/icon512.png",
-    "/app.js",
-    "/sw.js",
-    "/js/button.js",
-    "/js/checkbox.js",
-    "/json/manifest.json",
+    "/WebLabs/index.html",
+    "/WebLabs/dashboard.html",
+    "/WebLabs/task.html",
+    "/WebLabs/message.html",
+    "/WebLabs/css/style.css",
+    "/WebLabs/css/modals.css",
+    "/WebLabs/icons/bell.png",
+    "/WebLabs/icons/delete.png",
+    "/WebLabs/icons/pencil.png",
+    "/WebLabs/icons/user.png",
+    "/WebLabs/icons/icon192.png",
+    "/WebLabs/js/app.js",
+    "/WebLabs/js/button.js",
+    "/WebLabs/js/checkbox.js",
+    "/WebLabs/sw.js",
+    "/WebLabs/json/manifest.json"
 ];
 
 // Встановлення Service Worker та кешування файлів
@@ -47,7 +47,6 @@ self.addEventListener("install", (event) => {
     event.respondWith(
       caches.match(event.request)
         .then(response => response || fetch(event.request))
-        .catch(() => caches.match('/index.html'))
     );
   });
   
