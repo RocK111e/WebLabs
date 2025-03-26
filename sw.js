@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v3";
+const CACHE_NAME = "pwa-cache-v4";
 const ASSETS = [
     "/WebLabs/index.html",
     "/WebLabs/dashboard.html",
@@ -15,7 +15,7 @@ const ASSETS = [
     "/WebLabs/js/button.js",
     "/WebLabs/js/checkbox.js",
     "/WebLabs/sw.js",
-    "/WebLabs/json/manifest.json",
+    "/WebLabs/json/manifest.json"
 ];
 
 // Встановлення Service Worker та кешування файлів
