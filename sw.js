@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v2";
+const CACHE_NAME = "pwa-cache-v3";
 const ASSETS = [
     "/WebLabs/index.html",
     "/WebLabs/dashboard.html",
@@ -14,7 +14,7 @@ const ASSETS = [
     "/WebLabs/js/app.js",
     "/WebLabs/js/button.js",
     "/WebLabs/js/checkbox.js",
-    "/WebLabs/js/sw.js",
+    "/WebLabs/sw.js",
     "/WebLabs/json/manifest.json",
 ];
 
@@ -47,7 +47,7 @@ self.addEventListener("install", (event) => {
     event.respondWith(
       caches.match(event.request)
         .then(response => response || fetch(event.request))
-        .catch(() => caches.match('/offline.html'))
+        .catch(() => caches.match('/index.html'))
     );
   });
   
