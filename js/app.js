@@ -8,9 +8,9 @@ import {
     initialize_delete_modal,
     update_buttons,
     close_modal
-} from "./js/button.js";
+} from "./button.js";
 
-import { update_table_cb, setup_cb_listeners } from "./js/checkbox.js";
+import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
 
 document.addEventListener("DOMContentLoaded", function() {
     const bur_but = document.getElementById("burger-btn");

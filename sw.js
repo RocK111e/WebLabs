@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-cache-v4";
+const CACHE_NAME = "pwa-cache-v8";
 const ASSETS = [
     "/WebLabs/index.html",
     "/WebLabs/dashboard.html",
@@ -11,7 +11,7 @@ const ASSETS = [
     "/WebLabs/icons/pencil.png",
     "/WebLabs/icons/user.png",
     "/WebLabs/icons/icon192.png",
-    "/WebLabs/app.js",
+    "/WebLabs/js/app.js",
     "/WebLabs/js/button.js",
     "/WebLabs/js/checkbox.js",
     "/WebLabs/js/validation.js",
