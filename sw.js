@@ -11,9 +11,10 @@ const ASSETS = [
     "/WebLabs/icons/pencil.png",
     "/WebLabs/icons/user.png",
     "/WebLabs/icons/icon192.png",
-    "/WebLabs/js/app.js",
+    "/WebLabs/app.js",
     "/WebLabs/js/button.js",
     "/WebLabs/js/checkbox.js",
+    "/WebLabs/js/validation.js",
     "/WebLabs/sw.js",
     "/WebLabs/json/manifest.json"
 ];
