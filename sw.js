@@ -14,6 +14,7 @@ const ASSETS = [
     "/WebLabs/js/app.js",
     "/WebLabs/js/button.js",
     "/WebLabs/js/checkbox.js",
+    "/WebLabs/js/validation.js",
     "/WebLabs/sw.js",
     "/WebLabs/json/manifest.json"
 ];

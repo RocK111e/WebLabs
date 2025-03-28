@@ -1,4 +1,5 @@
 import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
+import { validate_name, validate_date } from "./validation.js";
 
 let current_edited_row = null;
 
@@ -73,6 +74,31 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
         console.error("Table element not found in HTML");
         return;
     }
+
+    let first_name_pass = validate_name(first_name);
+    let last_name_pass = validate_name(last_name);
+    let birthday_pass = validate_date(birthday);
+    
+    if (first_name_pass !== true) {
+        //put alert to screen
+        console.log(first_name_pass);
+        return;
+    } 
+
+    if (last_name_pass !== true) {
+        //put alert to screen
+        console.log(last_name_pass);
+        return
+    }
+
+    if (birthday_pass !== true) {
+        //put alert to screen
+        console.log(birthday_pass);
+        return;
+    }
+
+    console.log("Validating passed");
+
     const new_row = table.insertRow(-1);
     new_row.innerHTML = `
         <td>
@@ -131,9 +157,7 @@ export function initialize_add_form() {
             modal.style.display = 'none'; 
             return; 
         }
-
         add_student_to_table(group, first_name, last_name, gender, birthday);
-        const modal = document.getElementById('add-modal');
         close_modal(event);
         add_form.reset();
         setup_cb_listeners();
