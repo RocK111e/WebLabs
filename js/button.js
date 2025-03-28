@@ -22,10 +22,15 @@ export function burger_menu() {
 
 export function open_edit_modal(event) {
     const modal = document.getElementById('edit-modal');
+    const edit_form = document.getElementById('edit-form');
     modal.style.display = 'block';
     current_edited_row = event.target.closest('tr');
     console.log('Edit clicked for row:', current_edited_row);
 
+    // Reset the form to match the add modal's empty state
+    edit_form.reset();
+
+    // Then fill with row data
     const cells = current_edited_row.cells;
     document.getElementById('edit-group').value = cells[1].textContent;
     const full_name = cells[2].textContent.split(' ');
@@ -60,6 +65,12 @@ export function close_modal(event) {
     const modal = event.target.closest('.modal');
     modal.style.display = 'none';
     current_edited_row = null;
+
+    // Clear all warnings when closing the modal
+    document.querySelectorAll('.warning').forEach(warning => {
+        warning.style.display = 'none';
+        warning.textContent = '';
+    });
 }
 
 export function open_add_modal(event) {
@@ -80,19 +91,16 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
     let birthday_pass = validate_date(birthday);
     
     if (first_name_pass !== true) {
-        //put alert to screen
         console.log(first_name_pass);
         return;
     } 
 
     if (last_name_pass !== true) {
-        //put alert to screen
         console.log(last_name_pass);
-        return
+        return;
     }
 
     if (birthday_pass !== true) {
-        //put alert to screen
         console.log(birthday_pass);
         return;
     }
@@ -136,6 +144,56 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
     update_buttons();
 }
 
+export function validate_form(prefix, group, first_name, last_name, gender, birthday) {
+    let isValid = true;
+
+    // Reset all warnings
+    document.querySelectorAll('.warning').forEach(warning => {
+        warning.style.display = 'none';
+        warning.textContent = '';
+    });
+
+    // Validate group
+    if (!group) {
+        document.getElementById(`${prefix}-group-warning`).style.display = 'block';
+        document.getElementById(`${prefix}-group-warning`).textContent = "Please select a group.";
+        isValid = false;
+    }
+
+    // Validate first name
+    let first_name_pass = validate_name(first_name);
+    if (first_name_pass !== true) {
+        document.getElementById(`${prefix}-first-name-warning`).style.display = 'block';
+        document.getElementById(`${prefix}-first-name-warning`).textContent = first_name_pass;
+        isValid = false;
+    }
+
+    // Validate last name
+    let last_name_pass = validate_name(last_name);
+    if (last_name_pass !== true) {
+        document.getElementById(`${prefix}-last-name-warning`).style.display = 'block';
+        document.getElementById(`${prefix}-last-name-warning`).textContent = last_name_pass;
+        isValid = false;
+    }
+
+    // Validate gender
+    if (!gender) {
+        document.getElementById(`${prefix}-gender-warning`).style.display = 'block';
+        document.getElementById(`${prefix}-gender-warning`).textContent = "Please select a gender.";
+        isValid = false;
+    }
+
+    // Validate birthday
+    let birthday_pass = validate_date(birthday);
+    if (birthday_pass !== true) {
+        document.getElementById(`${prefix}-birthday-warning`).style.display = 'block';
+        document.getElementById(`${prefix}-birthday-warning`).textContent = birthday_pass;
+        isValid = false;
+    }
+
+    return isValid;
+}
+
 export function initialize_add_form() {
     const add_form = document.getElementById('add-form');
     if (!add_form) {
@@ -144,23 +202,22 @@ export function initialize_add_form() {
     }
     add_form.addEventListener('submit', function(event) {
         event.preventDefault();
-        console.log("Form submitted");
+        console.log("Add form submitted");
+
         const group = document.getElementById('add-group').value;
         const first_name = document.getElementById('add-first-name').value;
         const last_name = document.getElementById('add-last-name').value;
         const gender = document.getElementById('add-gender').value;
         const birthday = document.getElementById('add-birthday').value;
 
-        if (!group || !first_name || !last_name || !gender || !birthday) {
-            alert("Please fill in all fields.");
-            const modal = document.getElementById('add-modal');
-            modal.style.display = 'none'; 
-            return; 
+        // Validate form with "add" prefix
+        if (validate_form('add', group, first_name, last_name, gender, birthday)) {
+            // If valid, add student and reset
+            add_student_to_table(group, first_name, last_name, gender, birthday);
+            close_modal(event);
+            add_form.reset();
+            setup_cb_listeners();
         }
-        add_student_to_table(group, first_name, last_name, gender, birthday);
-        close_modal(event);
-        add_form.reset();
-        setup_cb_listeners();
     });
 }
 
@@ -173,23 +230,27 @@ export function initialize_edit_form() {
     edit_form.addEventListener('submit', function(event) {
         event.preventDefault();
         console.log("Edit form submitted");
+
         const group = document.getElementById('edit-group').value;
         const first_name = document.getElementById('edit-first-name').value;
         const last_name = document.getElementById('edit-last-name').value;
         const gender = document.getElementById('edit-gender').value;
         const birthday = document.getElementById('edit-birthday').value;
 
-        if (current_edited_row) {
-            current_edited_row.cells[1].textContent = group; 
-            current_edited_row.cells[2].textContent = `${first_name} ${last_name}`;
-            current_edited_row.cells[3].textContent = gender;
-            current_edited_row.cells[4].textContent = birthday;
-        } else {
-            console.error("No row selected for editing");
+        // Validate form with "edit" prefix
+        if (validate_form('edit', group, first_name, last_name, gender, birthday)) {
+            // If valid, update the row and close
+            if (current_edited_row) {
+                current_edited_row.cells[1].textContent = group; 
+                current_edited_row.cells[2].textContent = `${first_name} ${last_name}`;
+                current_edited_row.cells[3].textContent = gender;
+                current_edited_row.cells[4].textContent = birthday;
+            } else {
+                console.error("No row selected for editing");
+            }
+            close_modal(event);
+            current_edited_row = null;
         }
-
-        close_modal(event); 
-        current_edited_row = null;
     });
 }
 
