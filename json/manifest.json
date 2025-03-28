@@ -1,8 +1,8 @@
 {
     "name": "My PWA App",
     "short_name": "PWA App",
-    "id": "/WebLabs",
-    "start_url": "/WebLabs",
+    "id": "/WebLabs/index.html",
+    "start_url": "/WebLabs/index.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#000000",
