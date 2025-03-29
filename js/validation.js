@@ -1,6 +1,6 @@
 //Bool to validate the form with regex or JS
-const regex = false;
-
+let regex = true;
+const name_regex = /^[a-zA-Z]{2,50}$/;
 
 function not_allowed_chars(str) {
     const allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -17,9 +17,14 @@ function not_allowed_chars(str) {
 export function validate_name(name)
 {
     if(regex){
-
+        console.log("Validating name with regex");
+        if (!name_regex.test(name)) {
+            return "Invalid name format";
+        }
+        return true;
     }
     else{
+        console.log("Validating name with JS");
         if (name.trim() === "") {
             return "Name cannot be empty";
         }
@@ -38,20 +43,15 @@ export function validate_name(name)
 
 export function validate_date(date)
 {
-    if(regex){
-
+    const inputDate = new Date(date);
+    const today = new Date();
+    const minDate = new Date("1901-01-01");
+    
+    if (inputDate > today) {
+        return "Date cannot be in the future";
     }
-    else{
-        const inputDate = new Date(date);
-        const today = new Date();
-        const minDate = new Date("1901-01-01");
-        
-        if (inputDate > today) {
-            return "Date cannot be in the future";
-        }
-        if (inputDate < minDate) {
-            return "Date cannot be earlier than 1901-01-01";
-        }
-        return true;
+    if (inputDate < minDate) {
+        return "Date cannot be earlier than 1901-01-01";
     }
+    return true;
 }
