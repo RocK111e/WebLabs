@@ -2,6 +2,12 @@ import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
 import { validate_name, validate_date } from "./validation.js";
 
 let current_edited_row = null;
+let next_id = 3;
+
+// Function to log JSON actions
+function log_json_action(action, data) {
+    console.log(`${action}:`, JSON.stringify(data));
+}
 
 export function burger_menu() {
     console.log("burger menu clicked");
@@ -27,10 +33,8 @@ export function open_edit_modal(event) {
     current_edited_row = event.target.closest('tr');
     console.log('Edit clicked for row:', current_edited_row);
 
-    // Reset the form to match the add modal's empty state
     edit_form.reset();
 
-    // Then fill with row data
     const cells = current_edited_row.cells;
     document.getElementById('edit-group').value = cells[1].textContent;
     const full_name = cells[2].textContent.split(' ');
@@ -66,7 +70,6 @@ export function close_modal(event) {
     modal.style.display = 'none';
     current_edited_row = null;
 
-    // Clear all warnings when closing the modal
     document.querySelectorAll('.warning').forEach(warning => {
         warning.style.display = 'none';
         warning.textContent = '';
@@ -107,9 +110,10 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
 
     console.log("Validating passed");
 
+    const id = next_id;
     const new_row = table.insertRow(-1);
     new_row.innerHTML = `
-        <td>
+        <td data-id="${id}">
             <label>
                 <input type="checkbox" class="table_cb" name="checkbox">
                     Select
@@ -138,8 +142,19 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
     new_edit_btn.addEventListener('click', open_edit_modal);
     new_delete_btn.addEventListener('click', open_delete_modal);
 
-    setup_cb_listeners();
+    // Log the newly added student
+    const newData = {
+        id,
+        group,
+        fullName: `${first_name} ${last_name}`,
+        gender,
+        birthday
+    };
+    log_json_action('Row added', newData);
 
+    next_id++;
+
+    setup_cb_listeners();
     update_main_cb();
     update_buttons();
 }
@@ -147,20 +162,17 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
 export function validate_form(prefix, group, first_name, last_name, gender, birthday) {
     let isValid = true;
 
-    // Reset all warnings
     document.querySelectorAll('.warning').forEach(warning => {
         warning.style.display = 'none';
         warning.textContent = '';
     });
 
-    // Validate group
     if (!group) {
         document.getElementById(`${prefix}-group-warning`).style.display = 'block';
         document.getElementById(`${prefix}-group-warning`).textContent = "Please select a group.";
         isValid = false;
     }
 
-    // Validate first name
     let first_name_pass = validate_name(first_name);
     if (first_name_pass !== true) {
         document.getElementById(`${prefix}-first-name-warning`).style.display = 'block';
@@ -168,7 +180,6 @@ export function validate_form(prefix, group, first_name, last_name, gender, birt
         isValid = false;
     }
 
-    // Validate last name
     let last_name_pass = validate_name(last_name);
     if (last_name_pass !== true) {
         document.getElementById(`${prefix}-last-name-warning`).style.display = 'block';
@@ -176,14 +187,12 @@ export function validate_form(prefix, group, first_name, last_name, gender, birt
         isValid = false;
     }
 
-    // Validate gender
     if (!gender) {
         document.getElementById(`${prefix}-gender-warning`).style.display = 'block';
         document.getElementById(`${prefix}-gender-warning`).textContent = "Please select a gender.";
         isValid = false;
     }
 
-    // Validate birthday
     let birthday_pass = validate_date(birthday);
     if (birthday_pass !== true) {
         document.getElementById(`${prefix}-birthday-warning`).style.display = 'block';
@@ -210,9 +219,7 @@ export function initialize_add_form() {
         const gender = document.getElementById('add-gender').value;
         const birthday = document.getElementById('add-birthday').value;
 
-        // Validate form with "add" prefix
         if (validate_form('add', group, first_name, last_name, gender, birthday)) {
-            // If valid, add student and reset
             add_student_to_table(group, first_name, last_name, gender, birthday);
             close_modal(event);
             add_form.reset();
@@ -237,14 +244,23 @@ export function initialize_edit_form() {
         const gender = document.getElementById('edit-gender').value;
         const birthday = document.getElementById('edit-birthday').value;
 
-        // Validate form with "edit" prefix
         if (validate_form('edit', group, first_name, last_name, gender, birthday)) {
-            // If valid, update the row and close
             if (current_edited_row) {
-                current_edited_row.cells[1].textContent = group; 
+                const id = current_edited_row.cells[0].getAttribute('data-id');
+                current_edited_row.cells[1].textContent = group;
                 current_edited_row.cells[2].textContent = `${first_name} ${last_name}`;
                 current_edited_row.cells[3].textContent = gender;
                 current_edited_row.cells[4].textContent = birthday;
+
+                const newData = {
+                    id,
+                    group,
+                    fullName: `${first_name} ${last_name}`,
+                    gender,
+                    birthday
+                };
+
+                log_json_action('Row changed', newData);
             } else {
                 console.error("No row selected for editing");
             }
@@ -264,20 +280,29 @@ export function initialize_delete_modal() {
     const confirm_button = delete_modal.querySelector('.confirm-delete');
 
     cancel_button.addEventListener('click', function(event) {
-        close_modal(event); 
+        close_modal(event);
     });
 
     confirm_button.addEventListener('click', function(event) {
         const checked_rows = Array.from(document.querySelectorAll('.table_cb:checked'))
             .map(cb => cb.closest('tr'));
+        
+        const deletedItems = checked_rows.map(row => ({
+            id: row.cells[0].getAttribute('data-id'),
+            group: row.cells[1].textContent,
+            fullName: row.cells[2].textContent,
+            gender: row.cells[3].textContent,
+            birthday: row.cells[4].textContent
+        }));
+
         checked_rows.forEach(row => {
             row.remove();
-            console.log('Row deleted:', row);
         });
+
+        log_json_action('Rows deleted', deletedItems);
 
         setup_cb_listeners();
         update_main_cb();
-
         update_buttons();
         close_modal(event);
     });
@@ -289,18 +314,10 @@ export function update_buttons() {
     const delete_buttons = document.querySelectorAll('.delete-but');
 
     edit_buttons.forEach(button => {
-        if (checked_count !== 1) {
-            button.disabled = true;
-        } else {
-            button.disabled = false;
-        }
+        button.disabled = checked_count !== 1;
     });
 
     delete_buttons.forEach(button => {
-        if (checked_count === 0) {
-            button.disabled = true;
-        } else {
-            button.disabled = false;
-        }
+        button.disabled = checked_count === 0;
     });
 }

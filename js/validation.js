@@ -1,5 +1,5 @@
 //Bool to validate the form with regex or JS
-let regex = true;
+let regex = false;
 const name_regex = /^[a-zA-Z]{2,50}$/;
 
 function not_allowed_chars(str) {
