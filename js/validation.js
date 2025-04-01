@@ -1,9 +1,11 @@
-//Bool to validate the form with regex or JS
+//DEPRECATED Bool to validate the form with regex or JS
 let regex = false;
 const name_regex = /^[a-zA-Z]{2,50}$/;
 
+const begin_end_char = /^[a-zA-Z]+[a-zA-Z- ']*[a-zA-Z]+$/;
+
 function not_allowed_chars(str) {
-    const allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ- '";
     let has_not_allowed = false;
     for (let char of str) {
         if (!allowed_chars.includes(char)) {
@@ -17,6 +19,7 @@ function not_allowed_chars(str) {
 export function validate_name(name)
 {
     if(regex){
+        //DEPRECATED
         console.log("Validating name with regex");
         if (!name_regex.test(name)) {
             return "Invalid name format";
@@ -34,8 +37,11 @@ export function validate_name(name)
         if (name.length > 50) {
             return "Name must be at most 50 characters long";
         }
-        if (not_allowed_chars(name)) {
-            return "Name must contain only letters";
+        if(not_allowed_chars(name)){
+            return "Name can contain only allowed letters";
+        }
+        if (!begin_end_char.test(name)){
+            return "Must begin and end with letter";
         }
         return true;
     }
@@ -46,7 +52,9 @@ export function validate_date(date)
     const inputDate = new Date(date);
     const today = new Date();
     const minDate = new Date("1901-01-01");
-    
+    if (!inputDate.getDate()){
+        return "Enter the date";
+    }
     if (inputDate > today) {
         return "Date cannot be in the future";
     }
