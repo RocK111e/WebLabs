@@ -58,14 +58,27 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 600);
     });
 
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/WebLabs/sw.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration);
-            })
-            .catch(error => {
-                console.log('Service Worker registration failed:', error);
-            });
-        });
+    // window.addEventListener('load', () => {
+    //     navigator.serviceWorker.register('/WebLabs/sw.js')
+    //         .then(registration => {
+    //             console.log('Service Worker registered:', registration);
+    //         })
+    //         .catch(error => {
+    //             console.log('Service Worker registration failed:', error);
+    //         });
+    //     });
+
+    console.log("Testing fetch");
+    //TEST FETCH
+    let request = new Request('/WebLabs/api/app.php/students', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+    fetch(request).then(response => {
+        console.log(response);
+    });
+    console.log("Fetch request sent");
     
 });
