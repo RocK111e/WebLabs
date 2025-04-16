@@ -15,7 +15,9 @@ class Router {
         //Define routes
         if (preg_match('#^/students#', $uri)) {
             $controller = new StudentController();
+
             if ($method === 'GET' && preg_match('#^/students$#', $uri)) {
+                //Get all students
                 echo $controller->get_all_students();
                 http_response_code(200);
                 $routeMatched = true;
@@ -27,18 +29,18 @@ class Router {
             } elseif ($method === 'POST' && preg_match('#^/students$#', $uri)) {
                 // Create a new student
                 $data = json_decode(file_get_contents('php://input'), true);
-                //echo $controller->createStudent($data);
+                echo $controller->create_student($data);
                 $routeMatched = true;
             } elseif ($method === 'PUT' && preg_match('#^/students/(\d+)$#', $uri, $matches)) {
                 // Update a specific student by ID
                 $id = $matches[1];
                 $data = json_decode(file_get_contents('php://input'), true);
-                //echo $controller->updateStudent($id, $data);
+                echo $controller->update_student($id, $data);
                 $routeMatched = true;
             } elseif ($method === 'DELETE' && preg_match('#^/students/(\d+)$#', $uri, $matches)) {
                 // Delete a specific student by ID
                 $id = $matches[1];
-                //echo $controller->deleteStudent($id);
+                echo $controller->delete_student($id);
                 $routeMatched = true;
             }
             
