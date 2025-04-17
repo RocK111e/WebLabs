@@ -35,6 +35,11 @@ class StudentController{
             http_response_code(422);
             return json_encode(['error' => "$validation_result"]);
         }
+        // Check if the student already exists
+        if ($this->db->check_for_copy($group, $name, $surname, $gender, $birthday)) {
+            http_response_code(409);
+            return json_encode(['error' => 'Student already exists']);
+        }
         // Create the student in the database
         $result = $this->db->create_student($group, $name, $surname, $gender, $birthday);
         if ($result) {
@@ -59,7 +64,11 @@ class StudentController{
             http_response_code(422);
             return json_encode(['error' => "$validation_result"]);
         }
-
+        // Check if the student already exists
+        if ($this->db->check_for_copy($group, $name, $surname, $gender, $birthday)) {
+            http_response_code(409);
+            return json_encode(['error' => 'Student already exists']);
+        }
         $result = $this->db->update_student($id, $group, $name, $surname, $gender, $birthday);
         if ($result) {
             http_response_code(201);

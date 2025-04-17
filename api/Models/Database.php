@@ -80,6 +80,17 @@ class DBService {
         return $count;
     }
 
+    public function check_for_copy($group, $name, $surname, $gender, $birthday){
+        // Check for duplicates
+        $query = "SELECT * FROM students.students_list WHERE \"Group\" = '$group' AND \"Name\" = '$name' AND \"Surname\" = '$surname' AND \"Gender\" = '$gender' AND \"Birthday\" = '$birthday'";
+        $result = pg_query($this->conn, $query);
+        if (pg_num_rows($result) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function close_db_connection() {
         if ($this->conn) {
             pg_close($this->conn);
