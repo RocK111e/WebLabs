@@ -1,8 +1,8 @@
 import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
 import { validate_name, validate_date } from "./validation.js";
+import { put_item_to_table } from "./data_process.js";
 
 let current_edited_row = null;
-let next_id = 3;
 
 // Function to log JSON actions
 function log_json_action(action, data) {
@@ -110,39 +110,10 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
 
     console.log("Validating passed");
 
-    const id = next_id;
-    const new_row = table.insertRow(-1);
-    new_row.innerHTML = `
-        <td data-id="${id}">
-            <label>
-                <input type="checkbox" class="table_cb" name="checkbox">
-                    Select
-                </input>
-            </label>
-        </td>
-        <td>${group}</td>
-        <td>${first_name} ${last_name}</td>
-        <td>${gender}</td>
-        <td>${birthday}</td>
-        <td>
-            <div class="status">
-                <div class="offline"></div>
-            </div>
-        </td>
-        <td>
-            <div class="opt_but">
-                <button name="Edit button" class="edit-but"><img class="edit_img" src="./icons/pencil.png" alt="Edit button"></button>  
-                <button name="Delete button" class="delete-but"><img class="delete_img" src="./icons/delete.png" alt="Delete button"></button>
-            </div>
-        </td>
-    `;
+    // TODO
+    // push to api
+    // refresh table
 
-    const new_edit_btn = new_row.querySelector('.edit-but');
-    const new_delete_btn = new_row.querySelector('.delete-but');
-    new_edit_btn.addEventListener('click', open_edit_modal);
-    new_delete_btn.addEventListener('click', open_delete_modal);
-
-    // Log the newly added student
     const newData = {
         id,
         group,
@@ -151,12 +122,6 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
         birthday
     };
     log_json_action('Row added', newData);
-
-    next_id++;
-
-    setup_cb_listeners();
-    update_main_cb();
-    update_buttons();
 }
 
 export function validate_form(prefix, group, first_name, last_name, gender, birthday) {
