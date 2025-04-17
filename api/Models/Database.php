@@ -70,6 +70,16 @@ class DBService {
         return pg_affected_rows($result) > 0;
     }
 
+    public function count_student(){
+        $query = 'SELECT COUNT(*) AS student_count FROM students.students_list';
+        $result = pg_query($this->conn, $query);
+        // Fetch the count
+        $row = pg_fetch_assoc($result);
+        $count = (int) $row['student_count']; // Cast to integer for safety
+        
+        return $count;
+    }
+
     public function close_db_connection() {
         if ($this->conn) {
             pg_close($this->conn);

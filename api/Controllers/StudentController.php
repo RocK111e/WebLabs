@@ -81,6 +81,11 @@ class StudentController{
         }
     }
 
+    public function count_student(){
+        $result = $this->db->count_student();
+        return json_encode($result);
+    }
+
     private function validation($group, $name, $surname, $gender, $birthday){
         //data validation
         if (empty($group) || empty($name) || empty($surname) || empty($gender) || empty($birthday)) {

@@ -42,6 +42,10 @@ class Router {
                 $id = $matches[1];
                 echo $controller->delete_student($id);
                 $routeMatched = true;
+            }elseif ($method === 'GET' && preg_match('#^/students/count$#', $uri)){
+                // Get count for pagination
+                echo $controller->count_student();
+                $routeMatched = true;
             }
             
         }
