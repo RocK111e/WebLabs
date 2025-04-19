@@ -1,7 +1,18 @@
 import { open_edit_modal, open_delete_modal, update_buttons } from "./button.js"; 
 import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
+import { fetch_all_students } from "./api_connector.js";
 
 const table= document.querySelector('table');
+
+export async function update_table() {
+    let students_list = await fetch_all_students();
+    console.log(students_list);
+    if (students_list !== false) {
+        students_list.forEach(item => {
+            put_item_to_table(item.id, item.Group, item.Name, item.Surname, item.Gender, item.Birthday, item.Status)
+        })
+    }
+}
 
 export function put_item_to_table(id, group, first_name, last_name, gender, birthday, status){
     if (!table) {

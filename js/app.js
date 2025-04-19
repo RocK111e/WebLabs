@@ -12,8 +12,8 @@ import {
 
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
 
-import { fetch_all_students } from "./api_connector.js";
-import { put_item_to_table } from "./data_process.js";
+
+import { update_table } from "./data_process.js";
 
 document.addEventListener("DOMContentLoaded", async function() {
     const bur_but = document.getElementById("burger-btn");
@@ -62,14 +62,8 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 
     //Fetch students
-
-    let students_list = await fetch_all_students();
-    console.log(students_list);
-    if (students_list !== false) {
-        students_list.forEach(item => {
-            put_item_to_table(item.id, item.Group, item.Name, item.Surname, item.Gender, item.Birthday, item.Status)
-        })
-    }
+    await update_table();
+    
 
     // window.addEventListener('load', () => {
     //     navigator.serviceWorker.register('/WebLabs/sw.js')
