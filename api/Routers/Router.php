@@ -2,6 +2,8 @@
 namespace App\Routers;
 require_once __DIR__ . '/../Controllers/StudentController.php';
 use App\Controllers\StudentController;
+require_once __DIR__ . '/../Controllers/PopulateController.php';
+use App\Controllers\PopulateController;
 
 class Router {
     public function route() {
@@ -52,6 +54,13 @@ class Router {
         elseif (preg_match('#^/login#', $uri)) {
             //$controller = new StudentController();
             // Handle login logic here
+        }
+        elseif (preg_match('#^/populate/(\d+)$#', $uri, $matches)) {
+            $controller = new PopulateController();
+            $count = $matches[1];
+            $controller->populate_students($count);
+            $routeMatched = true;
+            
         }
         // If no route was matched, return a 404 response
         if (!$routeMatched) {

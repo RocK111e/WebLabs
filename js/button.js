@@ -1,6 +1,7 @@
 import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
 import { validate_name, validate_date } from "./validation.js";
-import { put_item_to_table } from "./data_process.js";
+import { delete_student } from "./api_connector.js";
+import { update_table } from "./data_process.js";
 
 let current_edited_row = null;
 
@@ -235,7 +236,7 @@ export function initialize_edit_form() {
     });
 }
 
-export function initialize_delete_modal() {
+export async function initialize_delete_modal() {
     const delete_modal = document.getElementById('delete-modal');
     if (!delete_modal) {
         console.error("Delete modal not found");
@@ -248,27 +249,36 @@ export function initialize_delete_modal() {
         close_modal(event);
     });
 
-    confirm_button.addEventListener('click', function(event) {
+    confirm_button.addEventListener('click', async function(event) {
         const checked_rows = Array.from(document.querySelectorAll('.table_cb:checked'))
             .map(cb => cb.closest('tr'));
         
-        const deletedItems = checked_rows.map(row => ({
-            id: row.cells[0].getAttribute('data-id'),
-            group: row.cells[1].textContent,
-            fullName: row.cells[2].textContent,
-            gender: row.cells[3].textContent,
-            birthday: row.cells[4].textContent
-        }));
+            let deleted_rows = [];
+            for (const row of checked_rows) {
+                const id = row.cells[0].getAttribute('data-id');
+                const result = await delete_student(id);
+                if (result) {
+                    deleted_rows.push(row);
+                } else {
+                    console.error(`Failed to delete student with ID: ${id}`);
+                }
+            }
 
-        checked_rows.forEach(row => {
-            row.remove();
-        });
+            const deleted_map = deleted_rows.map(row => ({
+                id: row.cells[0].getAttribute('data-id'),
+                group: row.cells[1].textContent,
+                fullName: row.cells[2].textContent,
+                gender: row.cells[3].textContent,
+                birthday: row.cells[4].textContent
+            }));
+            
+            log_json_action('Rows deleted', deleted_map);
+            
+        await update_table();
 
-        log_json_action('Rows deleted', deletedItems);
-
-        setup_cb_listeners();
-        update_main_cb();
-        update_buttons();
+        // setup_cb_listeners();
+        // update_main_cb();
+        // update_buttons();
         close_modal(event);
     });
 }

@@ -5,16 +5,20 @@ import { fetch_all_students } from "./api_connector.js";
 const table= document.querySelector('table');
 
 export async function update_table() {
+    let data_rows = table.querySelectorAll('tr');
+    for (let i = 1; i < data_rows.length; i++) {
+        data_rows[i].remove();
+    }
     let students_list = await fetch_all_students();
     console.log(students_list);
-    if (students_list !== false) {
-        students_list.forEach(item => {
-            put_item_to_table(item.id, item.Group, item.Name, item.Surname, item.Gender, item.Birthday, item.Status)
-        })
+    if (students_list) {
+        for (const item of students_list) {
+            await put_item_to_table(item.id, item.Group, item.Name, item.Surname, item.Gender, item.Birthday, item.Status);
+        }
     }
 }
 
-export function put_item_to_table(id, group, first_name, last_name, gender, birthday, status){
+export async function put_item_to_table(id, group, first_name, last_name, gender, birthday, status){
     if (!table) {
         console.error("Table element not found in HTML");
         return;
