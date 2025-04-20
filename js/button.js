@@ -1,6 +1,6 @@
 import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
 import { validate_name, validate_date } from "./validation.js";
-import { delete_student } from "./api_connector.js";
+import { delete_student, post_student, put_student } from "./api_connector.js";
 import { update_table } from "./data_process.js";
 
 let current_edited_row = null;
@@ -83,7 +83,7 @@ export function open_add_modal(event) {
     console.log('Add Student modal opened');
 }
 
-export function add_student_to_table(group, first_name, last_name, gender, birthday) {
+export async function add_student_to_table(group, first_name, last_name, gender, birthday) {
     const table = document.querySelector('table');
     if (!table) {
         console.error("Table element not found in HTML");
@@ -111,18 +111,27 @@ export function add_student_to_table(group, first_name, last_name, gender, birth
 
     console.log("Validating passed");
 
-    // TODO
-    // push to api
-    // refresh table
+    let post_result = await post_student(group, first_name, last_name, gender, birthday)  
 
-    const newData = {
-        id,
-        group,
-        fullName: `${first_name} ${last_name}`,
-        gender,
-        birthday
-    };
-    log_json_action('Row added', newData);
+    if (post_result === true)
+    {
+        const newData = {
+            group,
+            fullName: `${first_name} ${last_name}`,
+            gender,
+            birthday
+        };
+        log_json_action('Row added', newData);
+        await update_table();
+    } 
+    else if (post_result === false) {
+        console.error("Failed to add student");
+        return;
+    }
+    else {
+        console.error(post_result);
+        return;
+    }
 }
 
 export function validate_form(prefix, group, first_name, last_name, gender, birthday) {
@@ -169,13 +178,13 @@ export function validate_form(prefix, group, first_name, last_name, gender, birt
     return isValid;
 }
 
-export function initialize_add_form() {
+export async function initialize_add_form() {
     const add_form = document.getElementById('add-form');
     if (!add_form) {
         console.error("Add form not found");
         return;
     }
-    add_form.addEventListener('submit', function(event) {
+    add_form.addEventListener('submit', async function(event) {
         event.preventDefault();
         console.log("Add form submitted");
 
@@ -186,21 +195,20 @@ export function initialize_add_form() {
         const birthday = document.getElementById('add-birthday').value;
 
         if (validate_form('add', group, first_name, last_name, gender, birthday)) {
-            add_student_to_table(group, first_name, last_name, gender, birthday);
+            await add_student_to_table(group, first_name, last_name, gender, birthday);
             close_modal(event);
             add_form.reset();
-            setup_cb_listeners();
         }
     });
 }
 
-export function initialize_edit_form() {
+export async function initialize_edit_form() {
     const edit_form = document.getElementById('edit-form');
     if (!edit_form) {
         console.error("Edit form not found");
         return;
     }
-    edit_form.addEventListener('submit', function(event) {
+    edit_form.addEventListener('submit', async function(event) {
         event.preventDefault();
         console.log("Edit form submitted");
 
@@ -213,20 +221,27 @@ export function initialize_edit_form() {
         if (validate_form('edit', group, first_name, last_name, gender, birthday)) {
             if (current_edited_row) {
                 const id = current_edited_row.cells[0].getAttribute('data-id');
-                current_edited_row.cells[1].textContent = group;
-                current_edited_row.cells[2].textContent = `${first_name} ${last_name}`;
-                current_edited_row.cells[3].textContent = gender;
-                current_edited_row.cells[4].textContent = birthday;
+                let put_result = await put_student(id, group, first_name, last_name, gender, birthday)  
 
-                const newData = {
-                    id,
-                    group,
-                    fullName: `${first_name} ${last_name}`,
-                    gender,
-                    birthday
-                };
-
-                log_json_action('Row changed', newData);
+                if (put_result === true)
+                {
+                    const newData = {
+                        group,
+                        fullName: `${first_name} ${last_name}`,
+                        gender,
+                        birthday
+                    };
+                    log_json_action('Row added', newData);
+                    await update_table();
+                } 
+                else if (put_result === false) {
+                    console.error("Failed to add student");
+                    return;
+                }
+                else {
+                    console.error(put_result);
+                    return;
+    }
             } else {
                 console.error("No row selected for editing");
             }

@@ -31,7 +31,8 @@ class DBService {
     }
 
     public function get_all_students() {
-        $query = "SELECT * FROM students.students_list";
+        $query = "SELECT * FROM students.students_list \n
+        ORDER BY \"id\" ASC";
         $result = pg_query($this->conn, $query);
         return pg_fetch_all($result);
     }

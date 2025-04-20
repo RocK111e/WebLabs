@@ -72,7 +72,7 @@ class StudentController{
         $result = $this->db->update_student($id, $group, $name, $surname, $gender, $birthday);
         if ($result) {
             http_response_code(201);
-            return json_encode(['message' => 'Student created successfully']);
+            return json_encode(['message' => 'Student updated successfully']);
         } else {
             http_response_code(500);
             return json_encode(['error' => 'Failed to create student']);

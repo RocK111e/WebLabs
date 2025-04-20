@@ -32,4 +32,48 @@ export async function delete_student(id) {
     return true;
 }
 
-export async function add_student()
+export async function post_student(group, first_name, last_name, gender, birthday){
+    const response = await fetch(path_prefix + 'students', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            Group: group,
+            Name: first_name,
+            Surname: last_name,
+            Gender: gender,
+            Birthday: birthday}
+        )
+    });
+    
+    if (response.ok) {
+        return true;
+    }
+    if (response.status === 409) {
+        return "This student already exists";
+    }
+    return false;
+}
+
+export async function put_student(id, group, first_name, last_name, gender, birthday){
+    const response = await fetch(path_prefix + 'students/' + id, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            Group: group,
+            Name: first_name,
+            Surname: last_name,
+            Gender: gender,
+            Birthday: birthday})
+        });
+    if (response.ok) {
+        return true;
+    }
+    if (response.status === 409) {
+        return "This student already exists";
+    }
+    return false;
+}
