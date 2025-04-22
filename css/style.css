@@ -418,7 +418,9 @@ table, th, td {
     border-radius: 4px;
     transition: background-color 0.3s ease;
 }
-
+.pagination-button.current{
+    font-weight: bold;
+}
 
 @keyframes shake {
     0% { transform: rotate(0deg); }

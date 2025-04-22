@@ -12,7 +12,6 @@ import {
 
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
 
-
 import { update_table } from "./data_process.js";
 
 document.addEventListener("DOMContentLoaded", async function() {
@@ -62,8 +61,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     });
 
     //Fetch students
-    await update_table();
-    
+    await update_table(1);
 
     // window.addEventListener('load', () => {
     //     navigator.serviceWorker.register('/WebLabs/sw.js')

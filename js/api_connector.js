@@ -77,3 +77,19 @@ export async function put_student(id, group, first_name, last_name, gender, birt
     }
     return false;
 }
+
+export async function fetch_students_count() {
+    const response = await fetch(path_prefix + 'students/count');
+    if (!response.ok) {
+        return false;
+    }
+    const response_text = await response.text();
+    const data = parseInt(response_text, 10);
+    if (!isNaN(data)) {
+        console.log(data); // Use the integer
+    } else {
+        console.error('Response is not a valid integer');
+        return false;
+    }
+    return data;
+}

@@ -1,4 +1,3 @@
-import { setup_cb_listeners, update_main_cb } from "./checkbox.js";
 import { validate_name, validate_date } from "./validation.js";
 import { delete_student, post_student, put_student } from "./api_connector.js";
 import { update_table } from "./data_process.js";
@@ -122,7 +121,7 @@ export async function add_student_to_table(group, first_name, last_name, gender,
             birthday
         };
         log_json_action('Row added', newData);
-        await update_table();
+        await update_table(0);
     } 
     else if (post_result === false) {
         console.error("Failed to add student");
@@ -232,7 +231,7 @@ export async function initialize_edit_form() {
                         birthday
                     };
                     log_json_action('Row added', newData);
-                    await update_table();
+                    await update_table(0);
                 } 
                 else if (put_result === false) {
                     console.error("Failed to add student");
@@ -289,7 +288,7 @@ export async function initialize_delete_modal() {
             
             log_json_action('Rows deleted', deleted_map);
             
-        await update_table();
+        await update_table(0);
 
         // setup_cb_listeners();
         // update_main_cb();
