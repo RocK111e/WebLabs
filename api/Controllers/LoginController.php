@@ -1,5 +1,5 @@
 <?php 
-namespace App\Controllers\LoginController;
+namespace App\Controllers;
 require_once __DIR__ . '/../Controllers/JWT.php';
 use App\Controllers\JWT;
 require_once __DIR__ . '/../Models/Database.php';
@@ -28,10 +28,15 @@ class LoginController {
         $token = $this->jwt->encode($id);
         $this->db->set_online($id, $token);
         http_response_code(200);
-        return json_encode(['token' => $token]);
+        return json_encode(['token' => $token, 'Name' => $user['Name'], 'Surname' => $user['Surname']]);
     }
 
-    public function logout($jwt) {
+    public function logout() {
+        $jwt = $this->extract_token();
+        if ($jwt === null) {
+            http_response_code(401);
+            return json_encode(['error' => 'No token provided']);
+        }
         $decode_result = $this->jwt->decode($jwt);
         if ($decode_result === null) {
             http_response_code(401);
@@ -50,30 +55,43 @@ class LoginController {
     }
 
     public function validate_credentials($login, $password) {
-        if(!preg_match('#^(a-zA-Z)+(0-9){4}$#', $login)){
+        if(!preg_match('#^[a-zA-Z -\']+[0-9]{4}$#', $login)){
+            echo json_encode(['error' => 'Invalid login format']);
             return false;
         }
-        if(!preg_match('#^#^\d{4}-\d{2}-\d{2}$#$#', $password)){
+        if(!preg_match('#^\d{4}-\d{2}-\d{2}$#', $password)){
+            echo json_encode(['error' => 'Invalid password format']);
             return false;
         }
         return true;
     }
 
-    public function is_logged_in() {
+    public function extract_token() {
         $headers = getallheaders();
     
-    // Check for Authorization header
-    if (!isset($headers['Authorization'])) {
-        http_response_code(401);
-        echo json_encode(['error' => 'No Authorization header provided']);
-        exit;
+        // Check for Authorization header
+        if (!isset($headers['Authorization'])) {
+            http_response_code(401);
+            echo json_encode(['error' => 'No Authorization header provided']);
+            exit;
+        }
+        
+        // Extract the token 
+        $authHeader = $headers['Authorization'];
+        if (preg_match('#Bearer\s(\S+)#', $authHeader, $matches)) {
+            return $matches[1];
+        }
+        return null;
     }
-    
-    // Extract the token 
-    $authHeader = $headers['Authorization'];
-    if (preg_match('#Bearer\s(\S+)#', $authHeader, $matches)) {
-        $token = $matches[1];
-        $decode_result = $this->jwt->decode($token);
+
+    public function is_logged_in() {
+        $jwt = $this->extract_token();
+        if ($jwt === null) {
+            http_response_code(401);
+            echo json_encode(['error' => 'No token provided']);
+            exit;
+        }
+        $decode_result = $this->jwt->decode($jwt);
         if ($decode_result === null) {
             http_response_code(401);
             echo json_encode(['error' => 'Invalid token']);
@@ -85,13 +103,8 @@ class LoginController {
             echo json_encode(['error' => 'Expired token']);
             exit;
         }
-        $this->db->set_online($decode_result['id'], $token);
+        $this->db->set_online($decode_result['id']);
         return true;
-    } else {
-        http_response_code(401);
-        echo json_encode(['error' => 'Invalid Authorization header format']);
-        exit;
-    }
     }
 
 }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login for CMS">
+  <link rel="manifest" href="json/manifest.json">
+  <link rel="icon" type="image/png" href="icons/icon192.png">
+  <title>Login - CMS</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+
+    :root {
+      --gray: #888888;
+      --white: #e4e4e4;
+      --light-gray: #bdbdbd;
+      --header-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
+      --aside-shadow: rgba(0, 0, 0, 0.17) 0px 10px 20px;
+      --header-icon-size: 28px;
+      --table-icon-size: 20px;
+    }
+
+    body {
+      margin: 0;
+      height: 100%;
+      overflow-y: hidden;
+      background-color: var(--white);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      border: 0;
+      margin: 0;
+      background-color: var(--gray);
+      position: fixed;
+      width: 100%;
+      height: 40px;
+      box-shadow: var(--header-shadow);
+    }
+
+    header .right {
+      padding: 0;
+      margin: 0;
+      display: flex;
+      gap: 15px;
+    }
+
+    header .hd_item {
+      margin: 0;
+      padding: 0;
+      max-height: 28px;
+    }
+
+    .burger-char {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 25px;
+      height: 25px;
+      font-size: 25px;
+      line-height: 25px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    header .logo {
+      font-size: 25px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    header .logo_redir {
+      font-weight: bold;
+      text-decoration: none;
+      color: black;
+    }
+
+    .burger-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      color: black;
+      cursor: pointer;
+    }
+
+    .below_header {
+      padding-top: 40px;
+      display: flex;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .login-container {
+      width: 90%;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 4px;
+    }
+
+    h2 {
+      font-size: 25px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid black;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 8px;
+      background-color: var(--white);
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background-color: var(--gray);
+      color: white;
+    }
+
+    @media screen and (max-width: 500px) {
+      .below_header {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="right">
+      <button id="burger-btn" class="burger-btn">
+        <span class="burger-char"> </span>
+      </button>
+      <div class="logo"><a href="index.html" class="logo_redir">CMS</a></div>
+    </div>
+    <div class="right">
+      <div class="hd_item">
+      </div>
+    </div>
+  </header>
+
+  <div class="below_header">
+    <main>
+      <div class="login-container">
+        <h2>Login</h2>
+        <div id="login-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+          <button class="login-btn" id="login-btn">Login</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script type="module" src="./js/login_page.js"></script>
+</body>
+</html>

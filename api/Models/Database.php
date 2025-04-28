@@ -136,10 +136,6 @@ class DBService {
             pg_close($this->conn);
         }
     }
-
-    public function __destruct() {
-        $this->close_db_connection();
-    }
 }
 
 ?>

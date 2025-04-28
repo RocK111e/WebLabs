@@ -13,6 +13,7 @@ import {
 import { update_table_cb, setup_cb_listeners } from "./checkbox.js";
 
 import { update_table } from "./data_process.js";
+import { logout } from "./api_connector.js";
 
 document.addEventListener("DOMContentLoaded", async function() {
     const bur_but = document.getElementById("burger-btn");
@@ -62,6 +63,13 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     //Fetch students
     await update_table(1);
+
+    document.querySelectorAll('logout-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {await logout()})});
+
+    document.querySelectorAll('.cancel-but').forEach(btn => {
+        btn.addEventListener('click', close_modal);
+    });
 
     // window.addEventListener('load', () => {
     //     navigator.serviceWorker.register('/WebLabs/sw.js')

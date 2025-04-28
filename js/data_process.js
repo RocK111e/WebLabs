@@ -13,6 +13,7 @@ export async function update_table(current_page) {
     }
     let students_list = await fetch_all_students();
     console.log(students_list);
+    if (students_list === false) { return; }
 
     if (current_page === 0){
         current_page = global_current_page;

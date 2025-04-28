@@ -4,6 +4,8 @@ require_once __DIR__ . '/../Controllers/StudentController.php';
 use App\Controllers\StudentController;
 require_once __DIR__ . '/../Controllers/PopulateController.php';
 use App\Controllers\PopulateController;
+require_once __DIR__ . '/../Controllers/LoginController.php';
+use App\Controllers\LoginController;
 
 class Router {
     public function route() {
@@ -20,7 +22,7 @@ class Router {
             $controller = new StudentController();
 
             // Check if the user is logged in
-            $login_controller = new \App\Controllers\LoginController\LoginController();
+            $login_controller = new LoginController();
             $logged_in = $login_controller->is_logged_in();
             if (!$logged_in) {
                 http_response_code(401);
@@ -60,16 +62,16 @@ class Router {
             
         }
         elseif (preg_match('#^/login#', $uri)) {
-            $controller = new \App\Controllers\LoginController\LoginController();
+            $controller = new LoginController();
             if ($method === 'POST' && preg_match('#^/login$#', $uri)) {
                 // Handle login logic here
                 $data = json_decode(file_get_contents('php://input'), true);
-                echo $controller->login($data['login'], $data['password']);
+                echo $controller->login($data['Login'], $data['Password']);
                 $routeMatched = true;
             }
         }
         elseif (preg_match('#^/logout#', $uri)) {
-            $controller = new \App\Controllers\LoginController\LoginController();
+            $controller = new LoginController();
             if ($method === 'POST' && preg_match('#^/logout$#', $uri)) {
                 // Handle logout logic here
                 $data = json_decode(file_get_contents('php://input'), true);
