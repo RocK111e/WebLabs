@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", async function() {
         btn.addEventListener('click', close_modal);
     });
 
+    document.querySelectorAll('.user_name').forEach(wrapper => {
+        wrapper.children[0].textContent = sessionStorage.getItem('user');
+    })
+
     // window.addEventListener('load', () => {
     //     navigator.serviceWorker.register('/WebLabs/sw.js')
     //         .then(registration => {
