@@ -43,8 +43,9 @@ class DBService {
     }
 
     public function create_student($group, $name, $surname, $gender, $birthday){
-        $query = "INSERT INTO students.students_list (\"Group\", \"Name\", \"Surname\", \"Gender\", \"Birthday\", \"Status\")
-            VALUES ('$group', '$name', '$surname', '$gender', '$birthday', false);";
+        $login = $this->login_generation($surname);
+        $query = "INSERT INTO students.students_list (\"Group\", \"Name\", \"Surname\", \"Gender\", \"Birthday\", \"Status\", \"login\")
+            VALUES ('$group', '$name', '$surname', '$gender', '$birthday', false, '$login');";
         $result = pg_query($this->conn, $query);
         if ($result) {
             // Check the number of affected rows
@@ -92,10 +93,52 @@ class DBService {
         }
     }
 
+    private function login_generation($surname){
+        $exit_bool = false;
+        while ($exit_bool === false){
+            $random_suffix = rand(1000, 9999);
+            $login = strtolower($surname) . $random_suffix;
+            $query = "SELECT * FROM students.students_list WHERE \"login\" = '$login'";
+            $result = pg_query($this->conn, $query);
+            if (pg_num_rows($result) == 0) {
+                $exit_bool = true;
+            }
+        }
+        return $login;
+    }
+
+    public function credentials_login($login, $password){
+        $query = "SELECT id, \"Name\", \"Surname\" FROM students.students_list WHERE \"login\" = '$login' AND \"Birthday\" = '$password'";
+        $result = pg_query($this->conn, $query);
+        if (pg_num_rows($result) === 1) {
+            $row = pg_fetch_assoc($result);
+            return [
+                'id' => $row['id'],
+                'Name' => $row['Name'],
+                'Surname' => $row['Surname']
+            ];
+        } else {
+            return false;
+        }
+    }
+    public function set_offline($id){
+        $query = "UPDATE students.students_list SET \"Status\" = false WHERE id = $id";
+        $result = pg_query($this->conn, $query);
+        return pg_affected_rows($result) > 0;
+    }
+    public function set_online($id){
+        $query = "UPDATE students.students_list SET \"Status\" = true WHERE id = $id";
+        $result = pg_query($this->conn, $query);
+        return pg_affected_rows($result) > 0;
+    }
     public function close_db_connection() {
         if ($this->conn) {
             pg_close($this->conn);
         }
+    }
+
+    public function __destruct() {
+        $this->close_db_connection();
     }
 }
 
