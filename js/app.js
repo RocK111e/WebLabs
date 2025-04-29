@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     //Fetch students
     await update_table(1);
 
-    document.querySelectorAll('logout-btn').forEach(btn => {
+    document.querySelectorAll('.account_but').forEach(btn => {
         btn.addEventListener('click', async () => {await logout()})});
 
     document.querySelectorAll('.cancel-but').forEach(btn => {

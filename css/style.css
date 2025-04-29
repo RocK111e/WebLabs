@@ -434,6 +434,11 @@ table, th, td {
     animation: shake 0.6s ease-in-out;
 }
 
+.account_but{
+    border: none;
+    background: none;
+}
+
 @media screen and (max-width: 500px) {
     .below_header {
         display: block; 

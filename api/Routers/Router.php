@@ -73,9 +73,7 @@ class Router {
         elseif (preg_match('#^/logout#', $uri)) {
             $controller = new LoginController();
             if ($method === 'POST' && preg_match('#^/logout$#', $uri)) {
-                // Handle logout logic here
-                $data = json_decode(file_get_contents('php://input'), true);
-                echo $controller->logout($data['jwt']);
+                echo $controller->logout();
                 $routeMatched = true;
             }
         }

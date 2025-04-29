@@ -71,6 +71,7 @@ export async function post_student(group, first_name, last_name, gender, birthda
         return true;
     }
     if (response.status === 409) {
+        alert("This student already exists");
         return "This student already exists";
     }
     return false;
@@ -97,6 +98,7 @@ export async function put_student(id, group, first_name, last_name, gender, birt
         return true;
     }
     if (response.status === 409) {
+        alert("This student already exists");
         return "This student already exists";
     }
     return false;
@@ -174,5 +176,6 @@ export async function logout() {
     if (response.ok) {
         sessionStorage.removeItem('token');
     }
+    console.log(response);
     window.location.href = "login.html";
 }
