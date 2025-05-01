@@ -1,4 +1,4 @@
-const path_prefix = 'api/app.php/';
+const path_prefix = 'http://webphp.local/api/app.php/';
 
 export async function fetch_all_students() {
     const response = await fetch(path_prefix + 'students', 
