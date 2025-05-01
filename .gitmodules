@@ -1,0 +1,6 @@
+[submodule "WebLabsPhp"]
+	path = WebLabsPhp
+	url = https://github.com/RocK111e/WebLabsPhp
+[submodule "WebLabsNode"]
+	path = WebLabsNode
+	url = https://github.com/RocK111e/WebLabsNode
