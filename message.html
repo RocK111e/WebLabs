@@ -5,73 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="json/manifest.json">
     <link rel="icon" type="image/png" href="icons/icon192.png">
+    <link rel="stylesheet" href="css/messages.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modals.css">
-    <title>Students</title>
+    <title>Messages</title>
+    <style>
+        #select-chat-participants { min-height: 100px; width: 100%; }
+        .modal-body .form-group { margin-bottom: 15px; }
+    </style>
 </head>
 <body>
     <header>
         <div class="right">
-            <button id="burger-btn" class="burger-btn">
-                <span class="burger-char">☰</span>
-            </button>  
-            <div class="logo"><a href="index.html" class="logo_redir">CMS</a></div>  
+            <button id="burger-btn" class="burger-btn"><span class="burger-char">☰</span></button>
+            <div class="logo"><a href="index.html" class="logo_redir">CMS</a></div>
         </div>
         <div class="right">
-            <div class="hd_item">
-                <div class="bell-container notification-show">
-                    <div class="bell-wrapper" href="message.html">
-                        <img class="bell_img" src="./icons/bell.png">
-                        <div class="red-ball"></div>
-                    </div>
-                    <div class="bell-notifications">
-                        <div class="notification-item">
-                            <img class="notification-icon" src="./icons/user.png" alt="User Icon">
-                            <div class="notification-content">
-                                <span class="notification-name">John Doe</span>
-                                <span class="notification-message">Submitted assignment</span>
-                            </div>
-                        </div>
-                        <div class="notification-item">
-                            <img class="notification-icon" src="./icons/user.png" alt="User Icon">
-                            <div class="notification-content">
-                                <span class="notification-name">Jane Smith</span>
-                                <span class="notification-message">Requested feedback</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="hd_item a_wrapper">
-                <div class="user">
-                    <img class="user_img" src="./icons/user.png">
-                    <div class="user_name">
-                        <a>John Doe</a>
-                    </div>
-                </div>
-                <div class="account_menu_modal">
-                    <span class="aml_option">Settings</span>
-                    <span class="aml_option">Log out</span>
-                </div>
-            </div>
+            <div class="hd_item"><div class="bell-container notification-show"> <!-- ... Bell ... --> </div></div>
+            <div class="hd_item a_wrapper"><div class="user"> <!-- ... User ... --> </div></div>
         </div>
     </header>
-    
+
     <div class="below_header">
-        <aside id="sidebar"> 
-            <nav>
-                <ul>
-                    <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="index.html">Students</a></li>
-                    <li><a href="task.html">Task</a></li>
-                </ul>
-            </nav>
-        </aside>
-        
+        <aside id="sidebar"> <!-- ... Nav ... --> </aside>
         <main>
-            Message
+            <div class="chat-container">
+                <div class="chat-list">
+                    <div class="main-header">
+                        <h2 class="students-title">Chat room</h2>
+                        <button class="add-button new-chat-btn" title="Start New Chat">+</button>
+                    </div>
+                </div>
+                <div class="chat-area">
+                    <div class="chat-header">
+                        <h2 class="students-title" id="chat-title">Select a Chat</h2>
+                        <div class="members"><span class="members-label">MEMBERS</span><div class="members-list"></div></div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <p class="no-messages-selected" style="text-align: center; padding: 20px; color: #777;">Select a chat or start a new one.</p>
+                    </div>
+                    <div id="typing-indicator" style="display: none; padding: 5px 15px; font-style: italic; color: #777; height: 20px; min-height:20px;"></div>
+                    <div class="chat-input">
+                        <input type="text" id="message-input" placeholder="Type message here..." disabled>
+                        <button id="send-message" disabled>Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="new-chat-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Start a New Chat / Group</h2>
+                        <span class="close-modal" data-modal-id="new-chat-modal">×</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="new-chat-name">Group Name (optional for 1-on-1):</label>
+                            <input type="text" id="new-chat-name" placeholder="E.g., Project Alpha Team">
+                        </div>
+                        <div class="form-group">
+                            <label for="select-chat-participants">Select Student(s) (Ctrl/Cmd + Click for multiple):</label>
+                            <select id="select-chat-participants" name="chat-participants" multiple>
+                                <option value="" disabled>-- Select student(s) --</option>
+                            </select>
+                            <span id="new-chat-error" class="warning" style="display: none; color: red; margin-top: 5px;"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="cancel-but" data-modal-id="new-chat-modal">Cancel</button>
+                        <button type="button" id="confirm-new-chat-btn" class="save-but">Start Chat</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
-    <script type="module" src="js/app.js"></script>  
+
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script type="module" src="js/messages_app.js"></script>
 </body>
 </html>
