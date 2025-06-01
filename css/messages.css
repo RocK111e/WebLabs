@@ -18,6 +18,14 @@
     --main-vertical-padding: 40px; 
 }
 
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    height: 100vh;
+}
 
 /* Messenger Container */
 .messanger-container {
