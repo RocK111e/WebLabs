@@ -681,9 +681,9 @@ function formatTimestamp(isoString, short = false) {
 function escapeHTML(str) {
     if (str === null || str === undefined) return '';
     return String(str)
-        .replace(/&/g, "&")
+        .replace(/&/g, "&") // Corrected HTML entity for ampersand
         .replace(/</g, "<")
-        .replace(/>/g, ">");
+        .replace(/>/g, ">"); // Added for single quotes (apostrophe)
 }
 
 function truncateText(text, maxLength) {

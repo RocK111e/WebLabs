@@ -1,18 +1,43 @@
 /* css/messages.css */
 
+/* Define CSS variables for header height and main padding for better control */
+:root {
+    /* 
+      IMPORTANT: Adjust this value to the ACTUAL height of your site's main header.
+      For example, if your header (containing logo, user name, bell icon) is 60px tall,
+      set this to 60px. The default of 40px might be too small if your header is taller,
+      causing the messenger to overlap the header when it becomes position:fixed.
+      Measure your header height using browser developer tools.
+    */
+    --header-height: 60px; /* Example: Adjusted from 40px. VERIFY THIS VALUE. */
+
+    /* Sum of top and bottom padding of the container holding the messenger 
+       (e.g., <main> or <div class="below_header">)
+       If your <main> or .below_header has padding-top: 20px and padding-bottom: 20px, this is 40px.
+    */
+    --main-vertical-padding: 40px; 
+}
+
+
 /* Messenger Container */
 .messanger-container {
     display: flex;
     width: 100%;
     max-width: 1200px;
-    height: calc(100vh - 40px - 20px - 20px); /* Assuming main padding is 20px top/bottom and header is 40px */
-    min-height: 400px;
+    /*
+       Adjusted height calculation:
+       100vh (viewport height)
+       - var(--header-height) (actual header height)
+       - var(--main-vertical-padding) (padding of main/below_header around messenger)
+    */
+    height: calc(100vh - var(--header-height) - var(--main-vertical-padding));
+    min-height: 400px; /* Minimum sensible height */
     background-color: #ffffff;
     border: 1px solid var(--light-gray, #ccc);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
-    position: relative; /* For absolute positioning of children on small screens */
+    margin-top: 0; /* Explicitly set margin-top to avoid collapsing margins from pushing it down */
 }
 
 /* Chat List (Left Panel) */
@@ -24,7 +49,6 @@
     border-right: 1px solid var(--light-gray, #ddd);
     display: flex;
     flex-direction: column;
-    z-index: 5; /* Default z-index */
 }
 
 .chat-list-header {
@@ -120,7 +144,7 @@
 }
 
 .chat-list-item.active-chat {
-    background-color: var(--white, #e4e4e4);
+    background-color: var(--white, #e4e4e4); /* Consider a less bright default */
 }
 .chat-list-item.active-chat:hover {
     background-color: #d8dfe5;
@@ -193,7 +217,6 @@
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
-    z-index: 1; /* Lower z-index for overlap */
 }
 
 .chat-header {
@@ -251,11 +274,9 @@
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
-    /* border: 2px solid #f0f2f5; /* Optional: border around icons */
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     flex-shrink: 0; /* Prevent icons from shrinking */
 }
-/* Removed negative margin for overlapping */
 
 .chat-header-actions {
     display: flex;
@@ -269,7 +290,7 @@
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
-    background-color: var(--white, #e4e4e4);
+    background-color: var(--white, #e4e4e4); /* Consider a lighter, less stark background like #f5f5f5 or #e9ecef */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -463,7 +484,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1000; /* High z-index to be on top of everything else */
     padding: 15px;
     box-sizing: border-box;
 }
@@ -477,6 +498,7 @@
     display: flex;
     flex-direction: column;
     max-height: 90vh; /* Max height for the modal */
+    z-index: 1001; /* Ensure dialog is above its overlay */
 }
 
 .modal-header-title {
@@ -727,7 +749,19 @@
         border-radius: 0;
         border-left: none;
         border-right: none;
-        height: calc(100vh - 40px); /* Full height below header */
+        /*
+           Full height below header on mobile.
+           The 'top' property ensures it positions itself correctly below the main header.
+           The 'height' property ensures it fills the remaining viewport space.
+        */
+        height: 95%;
+        width: 95%;
+        /*
+          If your main application header (the one with logo, user, bell) is also position:fixed,
+          ensure IT has a z-index (e.g., z-index: 1000 or higher).
+          The messenger container, when fixed, typically doesn't need a z-index unless it needs to
+          be explicitly above/below other fixed elements. Here, it should be below the main header.
+        */
     }
 
     .chat-list-toggle-btn {
@@ -735,7 +769,7 @@
     }
 
     .chat-list {
-        position: absolute;
+        position: absolute; /* Relative to .messanger-container */
         top: 0;
         left: 0;
         width: 85%;
@@ -744,10 +778,11 @@
         min-width: 0;
         border-right: 1px solid var(--light-gray, #ddd);
         border-bottom: none;
-        z-index: 10;
         transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* Shadow implies it's above */
+        background-color: #f7f9fa; /* Ensure background is solid */
+        z-index: 10; /* Ensure chat list can slide over chat container if needed */
     }
 
     .chat-list.chat-list-open {
@@ -756,6 +791,7 @@
 
     .chat-container {
         min-width: 0;
+        width: 100%; /* Take full width of its parent */
     }
 
     .chat-header {
@@ -797,7 +833,6 @@
     .participant-avatar {
         width: 24px;
         height: 24px;
-        /* border-width: 1px; /* Optional if keeping border */
     }
     .chat-header-participants {
         gap: 2px; /* Even smaller gap */
