@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="css/style.css"> <!-- Assuming this is your general styles -->
     <link rel="stylesheet" href="css/modals.css"> <!-- Assuming this is for modals (can be merged or separate) -->
     <title>Messages</title>
+    <!-- Load Socket.IO client from your Node.js server -->
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
 </head>
 <body>
     <header>
@@ -43,6 +45,7 @@
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="index.html">Students</a></li>
                     <li><a href="task.html">Tasks</a></li>
+                     <li><a href="message.html">Messages</a></li> <!-- Added Messages link for navigation -->
                 </ul>
             </nav>
         </aside>
@@ -62,27 +65,7 @@
                             </p>
                         </div>
                         <div class="chat-list-items" style="display: none;">
-                            <div class="chat-list-item active-chat">
-                                <img src="./icons/user.png" alt="Group Avatar" class="chat-avatar">
-                                <div class="chat-item-details">
-                                    <span class="chat-name">Frontend Team</span>
-                                    <span class="chat-last-message">Alice: Sounds good! See you then.</span>
-                                </div>
-                                <div class="chat-item-meta">
-                                    <span class="chat-timestamp">11:45 AM</span>
-                                    <span class="unread-count">1</span>
-                                </div>
-                            </div>
-                            <div class="chat-list-item">
-                                <img src="./icons/user.png" alt="Group Avatar" class="chat-avatar">
-                                <div class="chat-item-details">
-                                    <span class="chat-name">Project Group Alpha</span>
-                                    <span class="chat-last-message">Bob: I've pushed the latest changes.</span>
-                                </div>
-                                <div class="chat-item-meta">
-                                    <span class="chat-timestamp">Yesterday</span>
-                                </div>
-                            </div>
+                            <!-- Chat items will be dynamically populated by JS -->
                         </div>
                     </div>
                 </div>
@@ -90,43 +73,17 @@
                     <div class="chat-header">
                         <button class="chat-list-toggle-btn" title="Show Chats">☰</button>
                         <div class="chat-header-info">
-                            <span class="chat-header-name" id="currentChatName">Frontend Team</span>
+                            <span class="chat-header-name" id="currentChatName">Select a chat</span>
                             <div class="chat-header-participants" id="currentChatParticipants">
-                                <img src="./icons/user.png" alt="Alice W." title="Alice Wonderland" class="participant-avatar">
-                                <img src="./icons/user.png" alt="Bob B." title="Bob Builder" class="participant-avatar">
-                                <img src="./icons/user.png" alt="Charlie D." title="Charlie Davis" class="participant-avatar">
+                                <!-- Participant avatars will be dynamically populated by JS -->
                             </div>
                         </div>
                         <div class="chat-header-actions">
                         </div>
                     </div>
                     <div class="chat-messages-area">
-                        <div class="message-item received">
-                            <div class="message-content">
-                                <span class="message-sender-name">Alice</span>
-                                <div class="message-bubble">
-                                    <p>Hey Team! Are we still on for the meeting today?</p>
-                                </div>
-                                <span class="message-timestamp">11:40 AM</span>
-                            </div>
-                        </div>
-                        <div class="message-item sent">
-                            <div class="message-content">
-                                <div class="message-bubble">
-                                    <p>Hi Alice and team! Yes, absolutely. I'm looking forward to it.</p>
-                                </div>
-                                <span class="message-timestamp">11:42 AM</span>
-                            </div>
-                        </div>
-                        <div class="message-item received">
-                            <div class="message-content">
-                                <span class="message-sender-name">Bob</span>
-                                <div class="message-bubble">
-                                    <p>I'll be a few minutes late, apologies!</p>
-                                </div>
-                                <span class="message-timestamp">11:43 AM</span>
-                            </div>
-                        </div>
+                        <!-- Messages will be dynamically populated by JS. Initial placeholder: -->
+                        <div class="no-messages-placeholder" style="text-align:center; padding:20px; color:#777;">Select a chat to view messages.</div>
                     </div>
                     <div class="chat-input-area">
                         <textarea class="message-input" placeholder="Type a message..." rows="1"></textarea>
@@ -150,11 +107,13 @@
                         <input type="text" id="newGroupNameInput" placeholder="Group Name (optional)">
                     </div>
                     <div class="added-users-icons" id="newChatSelectedUsersIcons">
+                        <!-- Selected user icons will be dynamically populated by JS -->
                     </div>
                 </div>
                 <div class="add-users-container">
                     <input type="search" id="searchUsersForNewChatInput" placeholder="Search users to add...">
                     <div class="user-list-for-new-chat" id="newUserSearchResults">
+                        <!-- User search results will be dynamically populated by JS -->
                     </div>
                 </div>
                 <div class="new-chat-actions">
@@ -165,6 +124,9 @@
         </div>
     </div>
 
+    <!-- Load your application script AFTER Socket.IO client -->
     <script type="module" src="js/messages_app.js"></script>
+    <!-- Assuming button.js is needed for burger_menu -->
+    <script type="module" src="js/button.js"></script> 
 </body>
 </html>
