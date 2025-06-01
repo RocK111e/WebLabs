@@ -5,7 +5,7 @@
     display: flex;
     width: 100%;
     max-width: 1200px;
-    height: calc(100vh - 40px - 20px - 20px); /* Assuming main padding is 20px top/bottom */
+    height: calc(100vh - 40px - 20px - 20px); /* Assuming main padding is 20px top/bottom and header is 40px */
     min-height: 400px;
     background-color: #ffffff;
     border: 1px solid var(--light-gray, #ccc);
@@ -34,8 +34,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    min-height: 60px;
+    height: 60px; /* Explicit height */
     flex-shrink: 0;
+    box-sizing: border-box; /* Ensures padding and border are within the height */
 }
 
 .chat-search-bar {
@@ -93,27 +94,11 @@
     user-select: none;
 }
 
-.empty-chat-icon-container {
-    width: 22px;
-    height: 22px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.empty-chat-icon-img {
-    display: block;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    filter: brightness(0) opacity(0.6);
-}
-
 .empty-chat-text {
     font-size: 14px;
     line-height: 1.5;
     color: #6c757d;
+    margin-top: 10px; /* Added some margin since icon is gone */
 }
 
 .chat-list-items {
@@ -141,7 +126,7 @@
     background-color: #d8dfe5;
 }
 
-.chat-avatar {
+.chat-avatar { /* Avatar for group in chat list */
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -158,7 +143,7 @@
     min-width: 0;
 }
 
-.chat-name {
+.chat-name { /* Group Name in chat list */
     font-weight: 600;
     font-size: 15px;
     color: #333;
@@ -167,7 +152,7 @@
     text-overflow: ellipsis;
 }
 
-.chat-last-message {
+.chat-last-message { /* "Sender: Message" in chat list */
     font-size: 13px;
     color: #555;
     white-space: nowrap;
@@ -217,8 +202,9 @@
     padding: 0 15px;
     background-color: #f0f2f5;
     border-bottom: 1px solid var(--light-gray, #ddd);
-    height: 60px;
+    height: 60px; /* Explicit height */
     flex-shrink: 0;
+    box-sizing: border-box; /* Ensures padding and border are within the height */
 }
 
 .chat-list-toggle-btn {
@@ -236,33 +222,47 @@
 .chat-header-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px; /* Gap between name and participants block */
     flex-grow: 1;
-    min-width: 0;
+    min-width: 0; /* Important for flex children to shrink */
 }
 
-.chat-header-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.chat-header-name {
+.chat-header-name { /* Group name in chat header */
     font-size: 17px;
     font-weight: 600;
     color: #111;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex-shrink: 1; /* Allow name to shrink if participant icons take space */
 }
+
+.chat-header-participants {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Spacing between participant icons */
+    flex-shrink: 0; /* Don't shrink this container */
+    margin-left: auto; /* Pushes it towards the chat actions if space is tight */
+    overflow: hidden; /* Hides icons that don't fit if not using a "+N" indicator */
+}
+
+.participant-avatar {
+    width: 32px; /* Size of participant icons in header */
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    /* border: 2px solid #f0f2f5; /* Optional: border around icons */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Prevent icons from shrinking */
+}
+/* Removed negative margin for overlapping */
 
 .chat-header-actions {
     display: flex;
     align-items: center;
     gap: 5px;
-    margin-left: auto;
+    margin-left: 10px; /* Ensure some space from participant icons */
+    flex-shrink: 0;
 }
 
 .chat-messages-area {
@@ -278,31 +278,20 @@
 .message-item {
     display: flex;
     max-width: 75%;
-    align-items: flex-end;
+    align-items: flex-end; /* Aligns timestamp correctly at the bottom */
 }
 
-.message-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+.message-avatar { /* Individual message avatars are hidden for group chat */
+    display: none;
 }
 
 .message-item.received {
     align-self: flex-start;
 }
-.message-item.received .message-avatar {
-    margin-right: 10px;
-}
 
 .message-item.sent {
     align-self: flex-end;
     flex-direction: row-reverse;
-}
-.message-item.sent .message-avatar {
-    display: none;
-    margin-left: 10px;
 }
 
 .message-content {
@@ -314,23 +303,22 @@
     align-items: flex-end;
 }
 
-.message-sender-name {
+.message-sender-name { /* Sender's name in a group chat message */
     font-size: 12px;
     font-weight: 500;
     color: #666;
     margin-bottom: 4px;
-    margin-left: 5px;
 }
 .message-item.sent .message-sender-name {
-    display: none;
+    display: none; /* "Me" as sender, so name not needed */
 }
 .message-item.received .message-sender-name {
-    margin-left: 0;
+    margin-left: 0; /* Align with the start of the message bubble */
 }
 
 .message-bubble {
     padding: 10px 15px;
-    border-radius: 18px;
+    border-radius: 18px; /* Uniform border radius for all corners */
     font-size: 14.5px;
     line-height: 1.45;
     word-wrap: break-word;
@@ -347,13 +335,11 @@
 
 .message-item.received .message-bubble {
     background-color: #ffffff;
-    border-top-left-radius: 8px;
 }
 
 .message-item.sent .message-bubble {
     background-color: var(--gray, #007bff);
     color: #ffffff;
-    border-top-right-radius: 8px;
 }
 
 .message-timestamp {
@@ -371,6 +357,7 @@
     background-color: #f0f2f5;
     min-height: 60px;
     gap: 10px;
+    box-sizing: border-box;
 }
 
 .send-message-btn {
@@ -399,11 +386,12 @@
     border-radius: 20px;
     font-size: 14px;
     resize: none;
-    min-height: 22px;
-    max-height: 100px;
+    min-height: 22px; /* Corresponds to roughly one line of text with padding */
+    max-height: 100px; /* Roughly 4-5 lines */
     line-height: 1.4;
     background-color: #fff;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 .message-input:focus {
@@ -412,30 +400,36 @@
     box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.2);
 }
 
+/* Scrollbar Styles */
 .chat-list-items::-webkit-scrollbar,
 .chat-messages-area::-webkit-scrollbar,
-.message-input::-webkit-scrollbar {
+.message-input::-webkit-scrollbar,
+.user-list-for-new-chat::-webkit-scrollbar {
     width: 6px;
 }
 
 .chat-list-items::-webkit-scrollbar-thumb,
 .chat-messages-area::-webkit-scrollbar-thumb,
-.message-input::-webkit-scrollbar-thumb {
+.message-input::-webkit-scrollbar-thumb,
+.user-list-for-new-chat::-webkit-scrollbar-thumb {
     background-color: var(--light-gray, #aaa);
     border-radius: 3px;
 }
 .chat-list-items::-webkit-scrollbar-thumb:hover,
 .chat-messages-area::-webkit-scrollbar-thumb:hover,
-.message-input::-webkit-scrollbar-thumb:hover {
+.message-input::-webkit-scrollbar-thumb:hover,
+.user-list-for-new-chat::-webkit-scrollbar-thumb:hover {
     background-color: var(--gray, #888);
 }
 
 .chat-list-items::-webkit-scrollbar-track,
 .chat-messages-area::-webkit-scrollbar-track,
-.message-input::-webkit-scrollbar-track {
+.message-input::-webkit-scrollbar-track,
+.user-list-for-new-chat::-webkit-scrollbar-track {
     background-color: transparent;
 }
 
+/* Typing Indicator */
 .typing-indicator .message-bubble {
     padding: 10px 12px;
 }
@@ -457,55 +451,328 @@
     100% { opacity: .2; }
 }
 
+
+/* Modal Styles for Add New Chat */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.modal-dialog {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Max height for the modal */
+}
+
+.modal-header-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--light-gray, #eee);
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.modal-header-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #888;
+    cursor: pointer;
+    padding: 0 5px;
+    line-height: 1;
+}
+.modal-close-btn:hover {
+    color: #333;
+}
+
+/* Add Chat Container within Modal */
+.add-chat-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto; /* For content that might overflow */
+    flex-grow: 1;
+}
+
+.add-chat-container .header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--light-gray, #eee);
+}
+
+.chat-name-input {
+    flex-grow: 1;
+}
+
+.chat-name-input input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--light-gray, #ccc);
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.chat-name-input input:focus {
+    outline: none;
+    border-color: var(--gray, #888);
+    box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.15);
+}
+
+.added-users-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0; /* Prevent shrinking if group name input is long */
+    min-width: 0; /* Allow it to shrink if needed and wrap */
+    flex-wrap: wrap; /* Allow icons to wrap if many are added */
+}
+
+.added-users-icons img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #fff; /* Optional: for slight separation if icons overlap */
+    box-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+.add-users-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-users-container input[type="search"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--light-gray, #ccc);
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.add-users-container input[type="search"]:focus {
+    outline: none;
+    border-color: var(--gray, #888);
+    box-shadow: 0 0 0 2px rgba(136, 136, 136, 0.15);
+}
+
+.user-list-for-new-chat {
+    max-height: 200px; /* Or adjust as needed */
+    overflow-y: auto;
+    border: 1px solid var(--light-gray, #eee);
+    border-radius: 6px;
+    background-color: #f9f9f9;
+}
+.user-list-for-new-chat:empty {
+    padding: 15px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.user-list-for-new-chat:empty::after {
+    content: "Search for users to add them to the chat. Results will appear here.";
+}
+
+
+.user-list-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
+    border-bottom: 1px solid var(--light-gray, #eee);
+    background-color: #fff;
+    cursor: default;
+}
+.user-list-item:last-child {
+    border-bottom: none;
+}
+.user-list-item:hover {
+    background-color: #f0f2f5;
+}
+
+.user-list-item img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.user-list-item span {
+    flex-grow: 1;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-list-item .add-user-btn,
+.user-list-item .remove-user-btn {
+    padding: 5px 10px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    flex-shrink: 0;
+    min-width: 60px; /* To prevent text reflow when content changes (e.g., Add -> Added) */
+    text-align: center;
+}
+
+.user-list-item .add-user-btn {
+    background-color: var(--gray, #007bff);
+    color: white;
+    border-color: var(--gray, #007bff);
+}
+.user-list-item .add-user-btn:hover {
+    background-color: var(--gray, #0056b3);
+    border-color: var(--gray, #0056b3);
+}
+.user-list-item .add-user-btn:disabled {
+    background-color: #a0a0a0;
+    color: #f0f0f0;
+    border-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+.user-list-item .remove-user-btn {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+.user-list-item .remove-user-btn:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+
+.new-chat-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 15px;
+    border-top: 1px solid var(--light-gray, #eee);
+    margin-top: auto; /* Pushes to the bottom if .add-chat-container has flex-grow */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.new-chat-actions button {
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.new-chat-actions .btn-cancel {
+    background-color: #f0f2f5;
+    color: #555;
+    border-color: #ccc;
+}
+.new-chat-actions .btn-cancel:hover {
+    background-color: #e2e6ea;
+    border-color: #bbb;
+}
+
+.new-chat-actions .btn-confirm {
+    background-color: var(--gray, #007bff);
+    color: white;
+    border-color: var(--gray, #007bff);
+}
+.new-chat-actions .btn-confirm:hover {
+    background-color: var(--gray, #0056b3);
+    border-color: var(--gray, #0056b3);
+}
+.new-chat-actions .btn-confirm:disabled {
+    background-color: #a0a0a0;
+    border-color: #a0a0a0;
+    cursor: not-allowed;
+}
+
+
+/* Responsive Styles */
 @media screen and (max-width: 768px) {
-    /* On screens < 768px, chat-list becomes an overlay panel */
     .messanger-container {
-        /* flex-direction: column; /* Removed, as we're using absolute positioning for overlap */
         border-radius: 0;
         border-left: none;
         border-right: none;
+        height: calc(100vh - 40px); /* Full height below header */
     }
 
     .chat-list-toggle-btn {
-        display: block; /* Show the button to toggle chat list */
+        display: block;
     }
 
     .chat-list {
         position: absolute;
         top: 0;
         left: 0;
-        width: 85%; /* Example width for slide-in panel, can be 100% */
-        max-width: 320px; /* Max width for the slide-in panel */
+        width: 85%;
+        max-width: 320px;
         height: 100%;
-        min-width: 0; /* Override desktop min-width */
+        min-width: 0;
         border-right: 1px solid var(--light-gray, #ddd);
         border-bottom: none;
         z-index: 10;
-        transform: translateX(-100%); /* Hidden by default */
+        transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
         box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     }
 
-    /* This class would be added by JavaScript to show the chat list */
     .chat-list.chat-list-open {
         transform: translateX(0%);
     }
 
     .chat-container {
-        /* No longer needs to be absolute as .messanger-container handles the relative context for .chat-list */
-        /* width: 100%; /* Already flex-grow: 1, so it will take remaining space */
-        /* height: 100%; /* This would be an issue, it should fill the flex item space */
-        /* z-index: 1; /* Default z-index */
-        min-width: 0; /* Important for flex children */
+        min-width: 0;
     }
-
-    /* Make .chat-container take full width when .chat-list is hidden or side-by-side */
-    /* This might not be needed if JavaScript handles an overlay for .chat-list background */
 
     .chat-header {
         padding-left: 10px;
         padding-right: 10px;
     }
+     .chat-header-info {
+        gap: 8px; /* Reduce gap on smaller screens */
+    }
+    .participant-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    .chat-header-participants {
+        gap: 3px; /* Slightly smaller gap for smaller icons */
+    }
+
 
     .message-item {
         max-width: 90%;
@@ -513,14 +780,7 @@
 }
 
 @media screen and (max-width: 500px) {
-    /* Inherits slide-in behavior from 768px */
-    /* Specific overrides for very small screens if needed */
-    .chat-list {
-        /* width: 90%; /* Can adjust width for very small screens if 85% is too much */
-        /* max-width: 280px; /* Can adjust max-width */
-    }
-
-    .chat-avatar { /* Avatars in list items */
+    .chat-avatar {
         width: 40px;
         height: 40px;
     }
@@ -531,23 +791,37 @@
         font-size: 12px;
     }
 
-    .chat-header-avatar { /* Avatar in chat view header */
-        width: 35px;
-        height: 35px;
-    }
-    .chat-header-name { /* Name in chat view header */
+    .chat-header-name {
         font-size: 16px;
     }
-
-    .empty-chat-icon-container {
-        width: 20px;
-        height: 20px;
-        margin-bottom: 10px;
+    .participant-avatar {
+        width: 24px;
+        height: 24px;
+        /* border-width: 1px; /* Optional if keeping border */
     }
+    .chat-header-participants {
+        gap: 2px; /* Even smaller gap */
+    }
+
+
     .empty-chat-text {
         font-size: 13px;
     }
     .send-message-btn {
         padding: 8px 12px;
+    }
+
+    /* Modal on smaller screens */
+    .modal-dialog {
+        max-width: calc(100% - 30px); /* Ensure some padding from screen edges */
+        max-height: calc(100vh - 30px);
+    }
+    .add-chat-container .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .added-users-icons {
+        justify-content: flex-start; /* Align icons to the left */
+        margin-top: 10px;
     }
 }

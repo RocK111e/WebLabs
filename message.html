@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="icons/icon192.png">
     <link rel="stylesheet" href="css/messages.css">
     <link rel="stylesheet" href="css/style.css"> <!-- Assuming this is your general styles -->
-    <link rel="stylesheet" href="css/modals.css"> <!-- Assuming this is for modals -->
+    <link rel="stylesheet" href="css/modals.css"> <!-- Assuming this is for modals (can be merged or separate) -->
     <title>Messages</title>
 </head>
 <body>
@@ -42,7 +42,6 @@
                 <ul>
                     <li><a href="dashboard.html">Dashboard</a></li>
                     <li><a href="index.html">Students</a></li>
-                    <li><a href="message.html" class="active">Messages</a></li>
                     <li><a href="task.html">Tasks</a></li>
                 </ul>
             </nav>
@@ -50,37 +49,32 @@
 
         <main>
             <div class="messanger-container">
-                <div class="chat-list"> <!-- On narrow screens (<768px), this will be hidden by default with CSS transform -->
+                <div class="chat-list">
                     <div class="chat-list-header">
                         <input type="search" class="chat-search-bar" placeholder="Search or start new chat...">
-                        <button class="add-chat-btn" title="New Chat">+</button>
+                        <button class="add-chat-btn" id="openAddChatModalBtn" title="New Chat">+</button>
                     </div>
                     <div class="chat-list-body">
                         <div class="chat-list-empty-placeholder">
-                            <div class="empty-chat-icon-container">
-                                <img src="./icons/user.png" alt="No active chats" class="empty-chat-icon-img">
-                            </div>
                             <p class="empty-chat-text">
                                 No active conversations.<br>
-                                Search for users or start a new chat.
+                                Search for groups or users to start a new chat.
                             </p>
                         </div>
-                        <div class="chat-list-items" style="display: none;"> <!-- Initially hidden to show placeholder -->
-                            <!-- Example Chat Item 1 (Active) -->
+                        <div class="chat-list-items" style="display: none;">
                             <div class="chat-list-item active-chat">
-                                <img src="./icons/user.png" alt="User Avatar" class="chat-avatar">
+                                <img src="./icons/user.png" alt="Group Avatar" class="chat-avatar">
                                 <div class="chat-item-details">
-                                    <span class="chat-name">Alice Wonderland</span>
-                                    <span class="chat-last-message">Sounds good! See you then.</span>
+                                    <span class="chat-name">Frontend Team</span>
+                                    <span class="chat-last-message">Alice: Sounds good! See you then.</span>
                                 </div>
                                 <div class="chat-item-meta">
                                     <span class="chat-timestamp">11:45 AM</span>
                                     <span class="unread-count">1</span>
                                 </div>
                             </div>
-                            <!-- Example Chat Item 2 -->
                             <div class="chat-list-item">
-                                <img src="./icons/user.png" alt="User Avatar" class="chat-avatar">
+                                <img src="./icons/user.png" alt="Group Avatar" class="chat-avatar">
                                 <div class="chat-item-details">
                                     <span class="chat-name">Project Group Alpha</span>
                                     <span class="chat-last-message">Bob: I've pushed the latest changes.</span>
@@ -89,43 +83,50 @@
                                     <span class="chat-timestamp">Yesterday</span>
                                 </div>
                             </div>
-                            <!-- ... more items ... -->
                         </div>
                     </div>
                 </div>
                 <div class="chat-container">
                     <div class="chat-header">
-                        <button class="chat-list-toggle-btn" title="Show Chats">☰</button> <!-- Button to toggle chat list on narrow screens -->
+                        <button class="chat-list-toggle-btn" title="Show Chats">☰</button>
                         <div class="chat-header-info">
-                            <img src="./icons/user.png" alt="Chat Avatar" class="chat-header-avatar">
-                            <span class="chat-header-name">Alice Wonderland</span> <!-- Example, JS will update this -->
+                            <span class="chat-header-name" id="currentChatName">Frontend Team</span>
+                            <div class="chat-header-participants" id="currentChatParticipants">
+                                <img src="./icons/user.png" alt="Alice W." title="Alice Wonderland" class="participant-avatar">
+                                <img src="./icons/user.png" alt="Bob B." title="Bob Builder" class="participant-avatar">
+                                <img src="./icons/user.png" alt="Charlie D." title="Charlie Davis" class="participant-avatar">
+                            </div>
                         </div>
                         <div class="chat-header-actions">
-                            <!-- Actions container -->
                         </div>
                     </div>
                     <div class="chat-messages-area">
-                        <!-- Example Received Message -->
                         <div class="message-item received">
-                            <img src="./icons/user.png" alt="Sender Avatar" class="message-avatar">
                             <div class="message-content">
-                                <span class="message-sender-name">Alice Wonderland</span>
+                                <span class="message-sender-name">Alice</span>
                                 <div class="message-bubble">
-                                    <p>Hey James! Are we still on for the meeting today?</p>
+                                    <p>Hey Team! Are we still on for the meeting today?</p>
                                 </div>
                                 <span class="message-timestamp">11:40 AM</span>
                             </div>
                         </div>
-                        <!-- Example Sent Message -->
                         <div class="message-item sent">
                             <div class="message-content">
                                 <div class="message-bubble">
-                                    <p>Hi Alice! Yes, absolutely. I'm looking forward to it.</p>
+                                    <p>Hi Alice and team! Yes, absolutely. I'm looking forward to it.</p>
                                 </div>
                                 <span class="message-timestamp">11:42 AM</span>
                             </div>
                         </div>
-                        <!-- ... more messages ... -->
+                        <div class="message-item received">
+                            <div class="message-content">
+                                <span class="message-sender-name">Bob</span>
+                                <div class="message-bubble">
+                                    <p>I'll be a few minutes late, apologies!</p>
+                                </div>
+                                <span class="message-timestamp">11:43 AM</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="chat-input-area">
                         <textarea class="message-input" placeholder="Type a message..." rows="1"></textarea>
@@ -134,6 +135,34 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Add New Chat Modal -->
+    <div id="addChatModalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header-title">
+                <h3>New Chat</h3>
+                <button id="closeAddChatModalBtn" class="modal-close-btn" title="Close">×</button>
+            </div>
+            <div class="add-chat-container">
+                <div class="header">
+                    <div class="chat-name-input">
+                        <input type="text" id="newGroupNameInput" placeholder="Group Name (optional)">
+                    </div>
+                    <div class="added-users-icons" id="newChatSelectedUsersIcons">
+                    </div>
+                </div>
+                <div class="add-users-container">
+                    <input type="search" id="searchUsersForNewChatInput" placeholder="Search users to add...">
+                    <div class="user-list-for-new-chat" id="newUserSearchResults">
+                    </div>
+                </div>
+                <div class="new-chat-actions">
+                    <button id="cancelNewChatBtn" class="btn-cancel">Cancel</button>
+                    <button id="confirmNewChatBtn" class="btn-confirm" disabled>Create Chat</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="js/messages_app.js"></script>
