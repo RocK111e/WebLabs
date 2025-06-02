@@ -754,47 +754,51 @@ main {
 /* Responsive Styles */
 @media screen and (max-width: 768px) {
     .messanger-container {
+        position: relative; /* Add this to make absolute positioning work */
         border-radius: 0;
         border-left: none;
         border-right: none;
-        /*
-           Full height below header on mobile.
-           The 'top' property ensures it positions itself correctly below the main header.
-           The 'height' property ensures it fills the remaining viewport space.
-        */
         height: 95%;
         width: 95%;
-        /*
-          If your main application header (the one with logo, user, bell) is also position:fixed,
-          ensure IT has a z-index (e.g., z-index: 1000 or higher).
-          The messenger container, when fixed, typically doesn't need a z-index unless it needs to
-          be explicitly above/below other fixed elements. Here, it should be below the main header.
-        */
-    }
-
-    .chat-list-toggle-btn {
-        display: block;
     }
 
     .chat-list {
-        position: absolute; /* Relative to .messanger-container */
+        position: absolute;
         top: 0;
-        left: 0;
+        left: -100%;
         width: 85%;
         max-width: 320px;
         height: 100%;
         min-width: 0;
         border-right: 1px solid var(--light-gray, #ddd);
         border-bottom: none;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease-in-out;
-        box-shadow: 2px 0 10px rgba(0,0,0,0.1); /* Shadow implies it's above */
-        background-color: #f7f9fa; /* Ensure background is solid */
-        z-index: 10; /* Ensure chat list can slide over chat container if needed */
+        transition: left 0.3s ease-in-out;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        background-color: #f7f9fa;
+        z-index: 10;
     }
 
-    .chat-list.chat-list-open {
-        transform: translateX(0%);
+    .chat-list.show-mobile {
+        left: 0;
+    }
+
+    .chat-list-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .chat-list-close-btn {
+        display: block; /* Show close button on mobile */
+    }
+
+    .chat-search-bar {
+        flex: 1;
+        min-width: 0; /* Allow search bar to shrink */
+    }
+
+    .chat-list-toggle-btn {
+        display: block;
     }
 
     .chat-container {
@@ -867,4 +871,20 @@ main {
         justify-content: flex-start; /* Align icons to the left */
         margin-top: 10px;
     }
+}
+
+.chat-list-close-btn {
+    display: none; /* Hidden by default, shown only on mobile */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #888;
+    cursor: pointer;
+    padding: 0 5px;
+    margin-left: auto; /* Push to the right */
+    line-height: 1;
+}
+
+.chat-list-close-btn:hover {
+    color: #333;
 }
