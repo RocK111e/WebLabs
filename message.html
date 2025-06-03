@@ -103,18 +103,22 @@
                 <button id="closeAddChatModalBtn" class="modal-close-btn" title="Close">×</button>
             </div>
             <div class="add-chat-container">
-                <div class="header">
-                    <div class="chat-name-input">
-                        <input type="text" id="newGroupNameInput" placeholder="Group Name (optional)">
-                    </div>
-                    <div class="added-users-icons" id="newChatSelectedUsersIcons">
-                        <!-- Selected user icons will be dynamically populated by JS -->
+                <div class="chat-name-section">
+                    <label for="newGroupNameInput">Group Name</label>
+                    <input type="text" id="newGroupNameInput" placeholder="Enter group name" required>
+                </div>
+                <div class="selected-students-section">
+                    <label>Selected Students</label>
+                    <div class="selected-students-container">
+                        <div class="selected-students-avatars" id="selectedStudentsAvatars">
+                            <!-- Selected student avatars will be displayed here -->
+                        </div>
                     </div>
                 </div>
                 <div class="add-users-container">
-                    <input type="search" id="searchUsersForNewChatInput" placeholder="Search users to add...">
-                    <div class="user-list-for-new-chat" id="newUserSearchResults">
-                        <!-- User search results will be dynamically populated by JS -->
+                    <input type="search" id="searchStudentsInput" placeholder="Search students to add...">
+                    <div class="students-list" id="studentsSearchResults">
+                        <!-- Student search results will be dynamically populated by JS -->
                     </div>
                 </div>
                 <div class="new-chat-actions">

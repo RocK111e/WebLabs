@@ -246,10 +246,11 @@ export async function logout() {
 export async function fetch_my_chats() {
     console.log("[API CHAT] fetch_my_chats called");
     const userExternalId = sessionStorage.getItem('userExternalId');
+    const userDisplayName = sessionStorage.getItem('userDisplayName');
     const token = sessionStorage.getItem('token');
 
-    if (!userExternalId) {
-        console.error("[API CHAT] User external ID not found in session storage. Cannot fetch chats.");
+    if (!userExternalId || !userDisplayName) {
+        console.error("[API CHAT] User data not found in session storage. Cannot fetch chats.");
         return [];
     }
     if (!token) {
@@ -259,12 +260,12 @@ export async function fetch_my_chats() {
     }
 
     try {
-        const response = await fetch(`${node_api_prefix}/chats/user/${userExternalId}`, {
+        const response = await fetch(`${node_api_prefix}/chats?UserId=${userExternalId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
+                'Authorization': `Bearer ${token}`,
+            },
         });
         console.log("[API CHAT] fetch_my_chats response status:", response.status);
 
