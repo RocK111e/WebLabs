@@ -1,7 +1,7 @@
 // WebLabs/js/api_connector.js
 
 const php_api_prefix = 'http://webphp.local/api/app.php'; // PHP API base
-const node_api_prefix = 'http://localhost:3000';          // Node.js chat API base
+const node_api_prefix = 'http://webnode.local';          // Node.js chat API base
 
 // --- Student API functions (Used for fetching user details for chat) ---
 export async function fetch_all_students() { // Used to populate user list for new chats
@@ -287,68 +287,6 @@ export async function fetch_my_chats() {
     }
 }
 
-export async function create_new_chat(participantExternalIds, chatName = null, creatorExternalId = null) {
-    console.log("[API CHAT] create_new_chat called with participants:", participantExternalIds, "name:", chatName, "creator:", creatorExternalId);
-    const token = sessionStorage.getItem('token');
-    if (!token) {
-        console.warn("[API CHAT] Token missing for create_new_chat. Redirecting to login.");
-        window.location.href = "login.html";
-        return null;
-    }
-
-    const isGroupAttempt = !!chatName || participantExternalIds.length > 2 || (participantExternalIds.length === 1 && participantExternalIds[0] === creatorExternalId);
-
-    if (isGroupAttempt && !creatorExternalId) {
-        console.error("[API CHAT] CreatorExternalId is required for creating a group chat.");
-        alert("Error: Creator ID missing for group chat.");
-        return null;
-    }
-    if (!participantExternalIds || participantExternalIds.length === 0) {
-        console.error("[API CHAT] Participant IDs are required to create a chat.");
-        alert("Error: No participants selected for the chat.");
-        return null;
-    }
-
-    const body = { participantExternalIds };
-    if (isGroupAttempt) {
-        body.chatName = chatName || "Unnamed Group";
-        body.creatorExternalId = creatorExternalId;
-    }
-    console.log("[API CHAT] create_new_chat request body:", body);
-
-    try {
-        const response = await fetch(`${node_api_prefix}/chats`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        });
-        console.log("[API CHAT] create_new_chat response status:", response.status);
-
-        if (response.status === 401) {
-            console.warn("[API CHAT] Unauthorized creating chat. Redirecting to login.");
-            window.location.href = "login.html";
-            return null;
-        }
-
-        const responseData = await response.json();
-        console.log("[API CHAT] create_new_chat response data:", responseData);
-
-        if (!response.ok) {
-            console.error(`[API CHAT] Error creating chat: ${response.status}`, responseData);
-            alert(`Failed to create chat: ${responseData.error || 'Server error. Please try again.'}`);
-            return null;
-        }
-        return responseData;
-    } catch (error) {
-        console.error("[API CHAT] Network or other error creating chat:", error);
-        alert("Failed to create chat due to a network error. Please check your connection and try again.");
-        return null;
-    }
-}
-
 export async function fetch_chat_messages(chatId, limit = 50, skip = 0) {
     console.log(`[API CHAT] fetch_chat_messages called for chatId: ${chatId}, limit: ${limit}, skip: ${skip}`);
     const token = sessionStorage.getItem('token');
@@ -428,6 +366,54 @@ export async function post_message_http(chatId, senderExternalId, message) {
     } catch (error) {
         console.error("[API CHAT] Network or other error posting message via HTTP:", error);
         alert("Failed to send message due to a network error.");
+        return null;
+    }
+}
+
+export async function create_chat(chatName, userIds) {
+    console.log(`[API] create_chat called with name: ${chatName} and users:`, userIds);
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+        console.warn("[API] No token for create_chat");
+        return null;
+    }
+    let participants = userIds;
+    participants.push(sessionStorage.getItem('userExternalId')); // Add current user to participants
+    try {
+        const response = await fetch(`${node_api_prefix}/chats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                chatName: chatName,
+                UserIds: participants
+            })
+        });
+
+        console.log(`[API] create_chat response status:`, response.status);
+        
+        if (response.status === 401) {
+            window.location.href = "login.html";
+            return null;
+        }
+
+        if (!response.ok) {
+            console.error(`[API] Error creating chat: ${response.status}`);
+            return null;
+        }
+
+        const data = await response.json();
+        if (data.error) {
+            console.error(`[API] API error creating chat: ${data.error}`);
+            return null;
+        }
+
+        console.log(`[API] Chat created successfully:`, data);
+        return data;
+    } catch (error) {
+        console.error("[API] Network error creating chat:", error);
         return null;
     }
 }

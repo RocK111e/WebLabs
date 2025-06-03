@@ -6,7 +6,7 @@ import {
     close_modal
 } from "./button.js";
 
-import { logout, fetch_my_chats, fetch_all_students } from "./api_connector.js";
+import { logout, fetch_my_chats, fetch_all_students, create_chat } from "./api_connector.js";
 
 // Global state
 let selectedStudents = new Set();
@@ -126,14 +126,8 @@ async function loadAndDisplayChats() {
         
         chatListItems.innerHTML = chats.map(chat => `
             <div class="chat-list-item" data-chat-id="${chat.id}">
-                <img class="chat-avatar" src="${chat.avatarUrl || './icons/group.png'}" alt="Chat Avatar">
                 <div class="chat-item-details">
-                    <div class="chat-name">${chat.name || 'Unnamed Chat'}</div>
-                    <div class="chat-last-message">${chat.lastMessage || 'No messages yet'}</div>
-                </div>
-                <div class="chat-item-meta">
-                    <span class="chat-timestamp">${chat.lastMessageTime ? new Date(chat.lastMessageTime).toLocaleTimeString() : ''}</span>
-                    ${chat.unreadCount ? `<span class="unread-count">${chat.unreadCount}</span>` : ''}
+                    <div class="chat-name">${chat.chatName || 'Unnamed Chat'}</div>
                 </div>
             </div>
         `).join('');
@@ -179,6 +173,32 @@ async function searchStudents(searchTerm) {
     })).filter(student => 
         `${student.name} ${student.surname}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
+}
+
+async function handleCreateChat() {
+    const groupNameInput = document.getElementById('newGroupNameInput');
+    const chatName = groupNameInput.value.trim();
+    const userIds = Array.from(selectedStudents);
+    const creatorExternalId = sessionStorage.getItem('userExternalId');
+
+    if (!chatName || userIds.length === 0) {
+        console.warn('Cannot create chat: missing name or participants');
+        return;
+    }
+
+    const result = await create_chat(chatName, userIds);
+    if (result) {
+        // Close the modal and reset selection
+        const addChatModalOverlay = document.getElementById('addChatModalOverlay');
+        addChatModalOverlay.style.display = 'none';
+        resetStudentSelection();
+        groupNameInput.value = '';
+
+        // Refresh the chat list
+        await loadAndDisplayChats();
+    } else {
+        alert('Failed to create chat. Please try again.');
+    }
 }
 
 // Initialize everything when the DOM is loaded
@@ -238,6 +258,27 @@ document.addEventListener("DOMContentLoaded", async function() {
         cancelNewChatBtn.addEventListener('click', () => {
             addChatModalOverlay.style.display = 'none';
             resetStudentSelection();
+        });
+    }
+
+    // Add confirm button click handler
+    const confirmNewChatBtn = document.getElementById('confirmNewChatBtn');
+    if (confirmNewChatBtn) {
+        confirmNewChatBtn.addEventListener('click', async () => {
+            // Show loading state
+            confirmNewChatBtn.disabled = true;
+            confirmNewChatBtn.textContent = 'Creating...';
+            
+            try {
+                await handleCreateChat();
+            } catch (error) {
+                console.error('Error creating chat:', error);
+                alert('Failed to create chat. Please try again.');
+            } finally {
+                // Reset button state
+                confirmNewChatBtn.disabled = false;
+                confirmNewChatBtn.textContent = 'Create Chat';
+            }
         });
     }
 
