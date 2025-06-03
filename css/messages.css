@@ -799,7 +799,7 @@ main {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible; /* Change from hidden to visible to show tooltip */
     cursor: pointer;
 }
 
@@ -807,26 +807,20 @@ main {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
 }
 
-/* Adjust tooltip position for smaller avatars */
-.selected-student-avatar .tooltip {
-    bottom: -28px;
-    padding: 4px 8px;
-    font-size: 11px;
-}
-
-/* Updated tooltip styles for selected students */
+/* Tooltip styles */
 .selected-student-avatar .tooltip {
     position: absolute;
-    bottom: -30px;
+    bottom: -28px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
     color: white;
-    padding: 6px 10px;
+    padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
@@ -838,6 +832,18 @@ main {
 .selected-student-avatar:hover .tooltip {
     opacity: 1;
     visibility: visible;
+}
+
+/* Add a small arrow to the tooltip */
+.selected-student-avatar .tooltip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 4px 4px 4px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
 }
 
 .add-users-container {
