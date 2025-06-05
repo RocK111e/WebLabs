@@ -287,9 +287,11 @@ export async function fetch_my_chats() {
     }
 }
 
-export async function fetch_chat_messages(chatId, limit = 50, skip = 0) {
-    console.log(`[API CHAT] fetch_chat_messages called for chatId: ${chatId}, limit: ${limit}, skip: ${skip}`);
+export async function fetch_chat_messages(chatId) {
+    console.log(`[API CHAT] fetch_chat_messages called for chatId: ${chatId}`);
     const token = sessionStorage.getItem('token');
+    const currentUserId = sessionStorage.getItem('userExternalId');
+    
     if (!token) {
         console.warn("[API CHAT] Token not found for fetch_chat_messages. Redirecting to login.");
         window.location.href = "login.html";
@@ -301,38 +303,40 @@ export async function fetch_chat_messages(chatId, limit = 50, skip = 0) {
     }
 
     try {
-        const response = await fetch(`${node_api_prefix}/chats/${chatId}/messages?limit=${limit}&skip=${skip}`, {
+        const response = await fetch(`${node_api_prefix}/chats/${chatId}/messages?limit=50&skip=0`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
-        console.log(`[API CHAT] fetch_chat_messages for ${chatId} response status:`, response.status);
 
         if (response.status === 401) {
             console.warn("[API CHAT] Unauthorized fetching messages. Redirecting to login.");
             window.location.href = "login.html";
             return [];
         }
+
         if (!response.ok) {
-            console.error(`[API CHAT] Error fetching chat messages for ${chatId}: ${response.status} ${response.statusText}`);
+            console.error(`[API CHAT] Error fetching chat messages: ${response.status}`);
             return [];
         }
+
         const messages = await response.json();
-        console.log(`[API CHAT] fetch_chat_messages for ${chatId} success, data:`, messages);
-        return Array.isArray(messages) ? messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) : [];
+        return messages;
     } catch (error) {
-        console.error(`[API CHAT] Network or other error fetching messages for ${chatId}:`, error);
+        console.error('[API CHAT] Error loading messages:', error);
         return [];
     }
 }
 
-export async function post_message_http(chatId, senderExternalId, message) {
-    console.log(`[API CHAT] post_message_http called for chatId: ${chatId}, sender: ${senderExternalId}`);
+export async function send_message(chatId, message) {
+    console.log(`[API CHAT] send_message called for chatId: ${chatId}`);
     const token = sessionStorage.getItem('token');
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    
     if (!token) {
-        console.warn("[API CHAT] Token not found for posting message. Redirecting to login.");
+        console.warn("[API CHAT] Token not found for sending message. Redirecting to login.");
         window.location.href = "login.html";
         return null;
     }
@@ -344,28 +348,28 @@ export async function post_message_http(chatId, senderExternalId, message) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ chatId, senderExternalId, message })
+            body: JSON.stringify({
+                chatId,
+                senderExternalId: userExternalId,
+                message
+            })
         });
-        console.log("[API CHAT] post_message_http response status:", response.status);
 
         if (response.status === 401) {
-            console.warn("[API CHAT] Unauthorized posting message. Redirecting to login.");
+            console.warn("[API CHAT] Unauthorized sending message. Redirecting to login.");
             window.location.href = "login.html";
             return null;
         }
 
-        const responseData = await response.json();
-        console.log("[API CHAT] post_message_http response data:", responseData);
-
         if (!response.ok) {
-            console.error(`[API CHAT] Error posting message via HTTP: ${response.status}`, responseData);
-            alert(`Failed to send message: ${responseData.error || 'Server error'}`);
+            console.error(`[API CHAT] Error sending message: ${response.status}`);
             return null;
         }
-        return responseData.data;
+
+        const result = await response.json();
+        return result;
     } catch (error) {
-        console.error("[API CHAT] Network or other error posting message via HTTP:", error);
-        alert("Failed to send message due to a network error.");
+        console.error('[API CHAT] Error sending message:', error);
         return null;
     }
 }
@@ -407,6 +411,12 @@ export async function create_chat(chatName, userIds) {
         const data = await response.json();
         if (data.error) {
             console.error(`[API] API error creating chat: ${data.error}`);
+            return null;
+        }
+
+        // Ensure we have the _id field in the response
+        if (!data._id) {
+            console.error(`[API] Chat created but no _id received:`, data);
             return null;
         }
 

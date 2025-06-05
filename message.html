@@ -72,23 +72,24 @@
                 </div>
                 <div class="chat-container">
                     <div class="chat-header">
-                        <button class="chat-list-toggle-btn" title="Show Chats">☰</button>
+                        <button class="chat-list-toggle-btn" title="Toggle Chat List">☰</button>
                         <div class="chat-header-info">
-                            <span class="chat-header-name" id="currentChatName">Select a chat</span>
-                            <div class="chat-header-participants" id="currentChatParticipants">
-                                <!-- Participant avatars will be dynamically populated by JS -->
+                            <span class="chat-header-name">Select a chat to start messaging</span>
+                            <div class="chat-header-participants">
+                                <!-- Participant avatars will be added here -->
                             </div>
-                        </div>
-                        <div class="chat-header-actions">
                         </div>
                     </div>
                     <div class="chat-messages-area">
-                        <!-- Messages will be dynamically populated by JS. Initial placeholder: -->
-                        <div class="no-messages-placeholder" style="text-align:center; padding:20px; color:#777;">Select a chat to view messages.</div>
+                        <div class="no-chat-selected">
+                            <p>Select a chat from the list to view messages</p>
+                        </div>
                     </div>
                     <div class="chat-input-area">
                         <textarea class="message-input" placeholder="Type a message..." rows="1"></textarea>
-                        <button class="send-message-btn" title="Send">Send</button>
+                        <button class="send-message-btn" title="Send Message">
+                            <span>Send</span>
+                        </button>
                     </div>
                 </div>
             </div>

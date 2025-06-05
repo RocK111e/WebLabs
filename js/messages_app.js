@@ -6,7 +6,14 @@ import {
     close_modal
 } from "./button.js";
 
-import { logout, fetch_my_chats, fetch_all_students, create_chat } from "./api_connector.js";
+import { 
+    logout, 
+    fetch_my_chats, 
+    fetch_all_students, 
+    create_chat,
+    fetch_chat_messages,
+    send_message as send_message_http
+} from "./api_connector.js";
 import ChatSocket from './sockets.js';
 
 // Global state
@@ -127,7 +134,7 @@ async function loadAndDisplayChats() {
         chatListEmpty.style.display = 'none';
         
         chatListItems.innerHTML = chats.map(chat => `
-            <div class="chat-list-item" data-chat-id="${chat.id}">
+            <div class="chat-list-item" data-chat-id="${chat._id}">
                 <div class="chat-item-details">
                     <div class="chat-name">${chat.chatName || 'Unnamed Chat'}</div>
                 </div>
@@ -136,10 +143,26 @@ async function loadAndDisplayChats() {
 
         // Add click handlers for chat items
         document.querySelectorAll('.chat-list-item').forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', async () => {
                 const chatId = item.dataset.chatId;
-                // TODO: Implement chat selection logic
-                console.log('Selected chat:', chatId);
+                
+                // Remove active class from all chat items
+                document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active-chat'));
+                // Add active class to selected chat
+                item.classList.add('active-chat');
+                
+                // Load messages for the selected chat
+                await loadChatMessages(chatId);
+                
+                // Update chat header with chat name
+                const chatName = item.querySelector('.chat-name').textContent;
+                document.querySelector('.chat-header-name').textContent = chatName;
+                
+                // On mobile, close the chat list after selection
+                const chatList = document.querySelector('.chat-list');
+                if (window.innerWidth <= 768) {
+                    closeChatList(chatList);
+                }
             });
         });
     } else {
@@ -203,57 +226,75 @@ async function handleCreateChat() {
     }
 }
 
-// Initialize socket connection
-function initializeSocket() {
-    const userExternalId = sessionStorage.getItem('userExternalId');
-    const username = sessionStorage.getItem('userDisplayName');
-    if (!userExternalId) {
-        console.error('User ID not found in session storage');
-        return;
-    }
-
-    chatSocket = new ChatSocket();
-    chatSocket.connectUser(userExternalId, username);
-
-    // Set up message listener
-    chatSocket.onNewMessage((data) => {
-        // TODO: Implement message display logic
-        console.log('New message received:', data);
-        // You would call a function here to add the message to the UI
-    });
-
-    // Set up typing status listener
-    chatSocket.onUserTyping((data) => {
-        // TODO: Implement typing indicator logic
-        const { username, isTyping } = data;
-        console.log(`${username} is ${isTyping ? 'typing...' : 'stopped typing'}`);
-        // You would update the UI to show/hide typing indicator
-    });
-
-    // Set up user status listener
-    chatSocket.onUserStatus((data) => {
-        // TODO: Implement user status update logic
-        console.log(`User ${data.userId} is ${data.status}`);
-        // You would update the UI to show user's online/offline status
-    });
-}
-
 // Function to send a message
 function sendMessage(message, chatId) {
-    if (!chatSocket || !message.trim() || !chatId) return;
+    if (!message.trim() || !chatId) return;
 
-    const userExternalId = sessionStorage.getItem('userExternalId');
-    const username = sessionStorage.getItem('userDisplayName') || 'User';
-
-    chatSocket.sendMessage(chatId, message, username, userExternalId);
+    if (chatSocket && chatSocket.isConnected()) {
+        const userExternalId = sessionStorage.getItem('userExternalId');
+        const username = sessionStorage.getItem('userDisplayName') || 'User';
+        
+        chatSocket.sendMessage(chatId, message, username, userExternalId);
+    } else {
+        console.error('Socket not connected. Cannot send message.');
+        alert('Connection error. Please try again.');
+    }
 }
 
-// Function to handle typing status
-function handleTypingStatus(chatId, isTyping) {
-    if (!chatSocket || !chatId) return;
+async function loadChatMessages(chatId) {
+    const messagesArea = document.querySelector('.chat-messages-area');
+    if (!messagesArea || !chatId) return;
 
-    const userExternalId = sessionStorage.getItem('userExternalId');
-    chatSocket.sendTypingStatus(chatId, userExternalId, isTyping);
+    try {
+        const currentUserId = sessionStorage.getItem('userExternalId');
+        
+        // Show loading state
+        messagesArea.innerHTML = '<div class="loading-messages">Loading messages...</div>';
+        
+        const messages = await fetch_chat_messages(chatId);
+        
+        // Clear loading state and previous messages
+        messagesArea.innerHTML = '';
+        
+        // Display messages
+        messages.forEach(msg => {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message-item ${msg.senderExternalId === currentUserId ? 'sent' : 'received'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = 'message-bubble';
+            messageBubble.textContent = msg.message;
+            
+            const messageInfo = document.createElement('div');
+            messageInfo.className = 'message-info';
+            
+            const senderName = document.createElement('span');
+            senderName.className = 'message-sender';
+            senderName.textContent = msg.username || 'Unknown User';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'message-time';
+            timestamp.textContent = new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageInfo.appendChild(senderName);
+            messageInfo.appendChild(timestamp);
+            messageContent.appendChild(messageBubble);
+            messageContent.appendChild(messageInfo);
+            messageElement.appendChild(messageContent);
+            
+            messagesArea.appendChild(messageElement);
+        });
+        
+        // Scroll to the bottom of messages
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+        
+    } catch (error) {
+        console.error('Error loading messages:', error);
+        messagesArea.innerHTML = '<div class="error-message">Failed to load messages. Please try again.</div>';
+    }
 }
 
 // Initialize everything when the DOM is loaded
@@ -382,35 +423,16 @@ document.addEventListener("DOMContentLoaded", async function() {
     // Add message input event listeners
     const messageInput = document.querySelector('.message-input');
     const sendMessageBtn = document.querySelector('.send-message-btn');
-    let typingTimeout;
 
     if (messageInput && sendMessageBtn) {
-        messageInput.addEventListener('input', () => {
-            const currentChatId = getCurrentChatId(); // You'll need to implement this
-            if (!currentChatId) return;
-
-            // Clear existing timeout
-            if (typingTimeout) clearTimeout(typingTimeout);
-
-            // Send typing status
-            handleTypingStatus(currentChatId, true);
-
-            // Set timeout to stop typing status
-            typingTimeout = setTimeout(() => {
-                handleTypingStatus(currentChatId, false);
-            }, 1000);
-        });
-
         sendMessageBtn.addEventListener('click', () => {
-            const currentChatId = getCurrentChatId(); // You'll need to implement this
+            const currentChatId = getCurrentChatId();
             if (!currentChatId) return;
 
             const message = messageInput.value.trim();
             if (message) {
                 sendMessage(message, currentChatId);
                 messageInput.value = '';
-                // Clear typing status
-                handleTypingStatus(currentChatId, false);
             }
         });
 
@@ -429,4 +451,67 @@ function getCurrentChatId() {
     // TODO: Implement this function to return the ID of the currently selected chat
     const activeChatElement = document.querySelector('.chat-list-item.active-chat');
     return activeChatElement ? activeChatElement.dataset.chatId : null;
+}
+
+// Initialize socket connection
+function initializeSocket() {
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    const username = sessionStorage.getItem('userDisplayName');
+    if (!userExternalId) {
+        console.error('User ID not found in session storage');
+        return;
+    }
+
+    chatSocket = new ChatSocket();
+    chatSocket.connectUser(userExternalId, username);
+
+    // Set up message listener
+    chatSocket.onNewMessage((data) => {
+        const currentChatId = getCurrentChatId();
+        
+        // Only handle messages for the currently selected chat
+        if (currentChatId === data.chatId) {
+            const messagesArea = document.querySelector('.chat-messages-area');
+            if (!messagesArea) return;
+
+            const messageElement = document.createElement('div');
+            messageElement.className = `message-item ${data.userId === userExternalId ? 'sent' : 'received'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            
+            const messageBubble = document.createElement('div');
+            messageBubble.className = 'message-bubble';
+            messageBubble.textContent = data.message;
+            
+            const messageInfo = document.createElement('div');
+            messageInfo.className = 'message-info';
+            
+            const senderName = document.createElement('span');
+            senderName.className = 'message-sender';
+            senderName.textContent = data.username || 'Unknown User';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'message-time';
+            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageInfo.appendChild(senderName);
+            messageInfo.appendChild(timestamp);
+            messageContent.appendChild(messageBubble);
+            messageContent.appendChild(messageInfo);
+            messageElement.appendChild(messageContent);
+            
+            messagesArea.appendChild(messageElement);
+            
+            // Scroll to the bottom
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+    });
+
+    // Set up user status listener
+    chatSocket.onUserStatus((data) => {
+        // TODO: Implement user status update logic
+        console.log(`User ${data.userId} is ${data.status}`);
+        // You would update the UI to show user's online/offline status
+    });
 }

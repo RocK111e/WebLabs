@@ -39,20 +39,6 @@ class ChatSocket {
         });
     }
 
-    // Send typing status
-    sendTypingStatus(chatId, userId, username, isTyping) {
-        if (!chatId || !userId || !username) {
-            console.error('Missing required parameters for typing status');
-            return;
-        }
-        this.socket.emit('typing_status', {
-            chatId,
-            userId,
-            username,
-            isTyping
-        });
-    }
-
     // Setup event listeners
     setupEventListeners() {
         // Connection events
@@ -101,22 +87,6 @@ class ChatSocket {
                 callback(data);
             } catch (error) {
                 console.error('Error processing new message:', error);
-            }
-        });
-    }
-
-    // Add typing status listener
-    onUserTyping(callback) {
-        this.socket.on('user_typing', (data) => {
-            try {
-                // Validate received data
-                if (!data.chatId || !data.userId || !data.username) {
-                    console.error('Received invalid typing status data:', data);
-                    return;
-                }
-                callback(data);
-            } catch (error) {
-                console.error('Error processing typing status:', error);
             }
         });
     }
