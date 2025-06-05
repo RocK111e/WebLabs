@@ -7,9 +7,11 @@ import {
 } from "./button.js";
 
 import { logout, fetch_my_chats, fetch_all_students, create_chat } from "./api_connector.js";
+import ChatSocket from './sockets.js';
 
 // Global state
 let selectedStudents = new Set();
+let chatSocket;
 
 // Chat list functionality
 function toggleChatList(chatList) {
@@ -201,6 +203,59 @@ async function handleCreateChat() {
     }
 }
 
+// Initialize socket connection
+function initializeSocket() {
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    const username = sessionStorage.getItem('userDisplayName');
+    if (!userExternalId) {
+        console.error('User ID not found in session storage');
+        return;
+    }
+
+    chatSocket = new ChatSocket();
+    chatSocket.connectUser(userExternalId, username);
+
+    // Set up message listener
+    chatSocket.onNewMessage((data) => {
+        // TODO: Implement message display logic
+        console.log('New message received:', data);
+        // You would call a function here to add the message to the UI
+    });
+
+    // Set up typing status listener
+    chatSocket.onUserTyping((data) => {
+        // TODO: Implement typing indicator logic
+        const { username, isTyping } = data;
+        console.log(`${username} is ${isTyping ? 'typing...' : 'stopped typing'}`);
+        // You would update the UI to show/hide typing indicator
+    });
+
+    // Set up user status listener
+    chatSocket.onUserStatus((data) => {
+        // TODO: Implement user status update logic
+        console.log(`User ${data.userId} is ${data.status}`);
+        // You would update the UI to show user's online/offline status
+    });
+}
+
+// Function to send a message
+function sendMessage(message, chatId) {
+    if (!chatSocket || !message.trim() || !chatId) return;
+
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    const username = sessionStorage.getItem('userDisplayName') || 'User';
+
+    chatSocket.sendMessage(chatId, message, username, userExternalId);
+}
+
+// Function to handle typing status
+function handleTypingStatus(chatId, isTyping) {
+    if (!chatSocket || !chatId) return;
+
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    chatSocket.sendTypingStatus(chatId, userExternalId, isTyping);
+}
+
 // Initialize everything when the DOM is loaded
 document.addEventListener("DOMContentLoaded", async function() {
     const currentPagePath = window.location.pathname.split("/").pop() || "index.html";
@@ -320,4 +375,58 @@ document.addEventListener("DOMContentLoaded", async function() {
             updateConfirmButtonState(document.getElementById('confirmNewChatBtn'));
         });
     }
+
+    // Initialize socket connection
+    initializeSocket();
+
+    // Add message input event listeners
+    const messageInput = document.querySelector('.message-input');
+    const sendMessageBtn = document.querySelector('.send-message-btn');
+    let typingTimeout;
+
+    if (messageInput && sendMessageBtn) {
+        messageInput.addEventListener('input', () => {
+            const currentChatId = getCurrentChatId(); // You'll need to implement this
+            if (!currentChatId) return;
+
+            // Clear existing timeout
+            if (typingTimeout) clearTimeout(typingTimeout);
+
+            // Send typing status
+            handleTypingStatus(currentChatId, true);
+
+            // Set timeout to stop typing status
+            typingTimeout = setTimeout(() => {
+                handleTypingStatus(currentChatId, false);
+            }, 1000);
+        });
+
+        sendMessageBtn.addEventListener('click', () => {
+            const currentChatId = getCurrentChatId(); // You'll need to implement this
+            if (!currentChatId) return;
+
+            const message = messageInput.value.trim();
+            if (message) {
+                sendMessage(message, currentChatId);
+                messageInput.value = '';
+                // Clear typing status
+                handleTypingStatus(currentChatId, false);
+            }
+        });
+
+        // Handle Enter key
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessageBtn.click();
+            }
+        });
+    }
 });
+
+// Helper function to get current chat ID
+function getCurrentChatId() {
+    // TODO: Implement this function to return the ID of the currently selected chat
+    const activeChatElement = document.querySelector('.chat-list-item.active-chat');
+    return activeChatElement ? activeChatElement.dataset.chatId : null;
+}
