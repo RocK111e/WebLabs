@@ -30,6 +30,10 @@ let statusMap = {};
 let participantStatusCache = new Map();
 let allStudentsCache = null;
 
+// Add these variables at the top with other global variables
+let selectedNewMembers = new Set();
+let currentChatId = null;
+
 // Chat list functionality
 function toggleChatList(chatList) {
     if (chatList) {
@@ -180,12 +184,21 @@ async function loadAndDisplayChats() {
                             <div class="chat-header-name"></div>
                             <div class="chat-header-participants"></div>
                         </div>
+                        <div class="chat-header-actions">
+                            <button id="addToChatBtn" class="add-to-chat-btn" title="Add to Chat">+</button>
+                        </div>
                     `;
                 }
                 
-                // Update chat name and participants
+                // Update chat name and show add button
                 const chatHeaderName = chatHeader.querySelector('.chat-header-name');
                 chatHeaderName.textContent = chatName;
+                
+                // Show add button when chat is selected
+                const addButton = document.getElementById('addToChatBtn');
+                if (addButton) {
+                    addButton.style.display = 'flex';
+                }
                 
                 // Fetch initial participant status when entering chat
                 await fetchParticipantStatus(chatId);
@@ -203,6 +216,12 @@ async function loadAndDisplayChats() {
     } else {
         chatListItems.style.display = 'none';
         chatListEmpty.style.display = 'block';
+        
+        // Hide add button when no chat is selected
+        const addButton = document.getElementById('addToChatBtn');
+        if (addButton) {
+            addButton.style.display = 'none';
+        }
     }
 }
 
@@ -684,6 +703,12 @@ document.addEventListener("DOMContentLoaded", async function() {
     const burgerBtn = document.getElementById("burger-btn");
     if (burgerBtn) burgerBtn.addEventListener("click", burger_menu);
 
+    // Initialize add button visibility
+    const addButton = document.getElementById('addToChatBtn');
+    if (addButton) {
+        addButton.style.display = 'none'; // Initially hidden
+    }
+
     document.querySelectorAll('.account_but').forEach(btn => {
         btn.addEventListener('click', async () => { await logout(); });
     });
@@ -836,6 +861,73 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         });
     }
+
+    // Add Members Modal Controls
+    const addMembersModalOverlay = document.getElementById('addMembersModalOverlay');
+    const addToChatBtn = document.getElementById('addToChatBtn');
+    const closeAddMembersModalBtn = document.getElementById('closeAddMembersModalBtn');
+    const cancelAddMembersBtn = document.getElementById('cancelAddMembersBtn');
+    const confirmAddMembersBtn = document.getElementById('confirmAddMembersBtn');
+    const searchMembersInput = document.getElementById('searchMembersInput');
+
+    // Add Members button click handler
+    if (addToChatBtn) {
+        addToChatBtn.addEventListener('click', () => {
+            if (addMembersModalOverlay) {
+                addMembersModalOverlay.style.display = 'flex';
+                // Clear previous search results
+                const searchResults = document.getElementById('membersSearchResults');
+                if (searchResults) {
+                    searchResults.innerHTML = '';
+                }
+                // Clear search input
+                if (searchMembersInput) {
+                    searchMembersInput.value = '';
+                }
+            }
+        });
+    }
+
+    // Close modal handlers
+    if (closeAddMembersModalBtn) {
+        closeAddMembersModalBtn.addEventListener('click', () => {
+            if (addMembersModalOverlay) {
+                addMembersModalOverlay.style.display = 'none';
+                selectedNewMembers.clear();
+                const selectedAvatarsContainer = document.getElementById('selectedMembersAvatars');
+                if (selectedAvatarsContainer) {
+                    selectedAvatarsContainer.innerHTML = '';
+                }
+            }
+        });
+    }
+
+    if (cancelAddMembersBtn) {
+        cancelAddMembersBtn.addEventListener('click', () => {
+            if (addMembersModalOverlay) {
+                addMembersModalOverlay.style.display = 'none';
+                selectedNewMembers.clear();
+                const selectedAvatarsContainer = document.getElementById('selectedMembersAvatars');
+                if (selectedAvatarsContainer) {
+                    selectedAvatarsContainer.innerHTML = '';
+                }
+            }
+        });
+    }
+
+    // Confirm button handler
+    if (confirmAddMembersBtn) {
+        confirmAddMembersBtn.addEventListener('click', handleAddMembers);
+    }
+
+    // Search input handler
+    if (searchMembersInput) {
+        searchMembersInput.addEventListener('input', debounce(async (e) => {
+            const searchTerm = e.target.value.trim();
+            const students = await searchStudents(searchTerm);
+            await displayMemberSearchResults(students);
+        }, 300));
+    }
 });
 
 // Helper function to get current chat ID
@@ -975,4 +1067,138 @@ async function updateParticipantsWithStatus(participants = null) {
         console.error('Error updating participants:', error);
         chatHeaderParticipants.innerHTML = '';
     }
+}
+
+function showChat(chatId) {
+    currentChatId = chatId;
+    const chat = chats.find(c => c.id === chatId);
+    if (chat) {
+        document.querySelector('.chat-header-name').textContent = chat.name;
+        document.querySelector('.chat-messages-area').innerHTML = ''; // Clear messages
+        
+        // Show add button
+        const addButton = document.getElementById('addToChatBtn');
+        if (addButton) {
+            addButton.style.display = 'flex';
+        }
+        
+        loadChatMessages(chatId);
+    } else {
+        document.querySelector('.chat-header-name').textContent = 'Select a chat to start messaging';
+        document.querySelector('.chat-messages-area').innerHTML = '';
+        
+        // Hide add button
+        const addButton = document.getElementById('addToChatBtn');
+        if (addButton) {
+            addButton.style.display = 'none';
+        }
+    }
+}
+
+// Add event listener for the add button
+document.querySelector('#addToChatBtn').addEventListener('click', () => {
+    // We'll implement the modal opening logic later
+    console.log('Add to chat clicked for chat:', currentChatId);
+});
+
+// Add this function to handle adding members to chat
+async function handleAddMembers() {
+    const confirmButton = document.getElementById('confirmAddMembersBtn');
+    if (!confirmButton || !currentChatId) return;
+
+    const memberIds = Array.from(selectedNewMembers);
+    if (memberIds.length === 0) return;
+
+    try {
+        // TODO: Implement the API call to add members
+        console.log('Adding members:', memberIds, 'to chat:', currentChatId);
+        
+        // Close modal and reset selection
+        const modal = document.getElementById('addMembersModalOverlay');
+        modal.style.display = 'none';
+        selectedNewMembers.clear();
+        
+        // Reset the selected members display
+        const selectedAvatarsContainer = document.getElementById('selectedMembersAvatars');
+        if (selectedAvatarsContainer) {
+            selectedAvatarsContainer.innerHTML = '';
+        }
+        
+        // Reset the confirm button
+        confirmButton.disabled = true;
+    } catch (error) {
+        console.error('Error adding members:', error);
+        alert('Failed to add members. Please try again.');
+    }
+}
+
+// Add this function to update the confirm button state
+function updateAddMembersConfirmButton() {
+    const confirmButton = document.getElementById('confirmAddMembersBtn');
+    if (confirmButton) {
+        confirmButton.disabled = selectedNewMembers.size === 0;
+    }
+}
+
+// Add this function to add selected member avatar
+function addSelectedMemberAvatar(student) {
+    const selectedAvatarsContainer = document.getElementById('selectedMembersAvatars');
+    if (!selectedAvatarsContainer) return;
+
+    const avatarElement = document.createElement('div');
+    avatarElement.className = 'selected-student-avatar';
+    avatarElement.innerHTML = `
+        <img src="${student.avatarUrl || './icons/user.png'}" alt="${student.name} ${student.surname}">
+        <div class="tooltip">${student.name} ${student.surname}</div>
+    `;
+
+    selectedAvatarsContainer.appendChild(avatarElement);
+}
+
+// Add this function to display search results in the Add Members modal
+async function displayMemberSearchResults(students) {
+    const studentsList = document.getElementById('membersSearchResults');
+    if (!studentsList) return;
+
+    if (students.length === 0) {
+        studentsList.innerHTML = '<div class="student-list-item">No students found</div>';
+        return;
+    }
+
+    studentsList.innerHTML = students.map(student => `
+        <div class="student-list-item ${selectedNewMembers.has(student.id) ? 'selected' : ''}" 
+             data-student-id="${student.id}">
+            <img src="${student.avatarUrl || './icons/user.png'}" alt="${student.name}">
+            <div class="student-info">
+                <div class="student-name">${student.name} ${student.surname}</div>
+                <div class="student-group">${student.group}</div>
+            </div>
+        </div>
+    `).join('');
+
+    // Add click handlers
+    studentsList.querySelectorAll('.student-list-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const studentId = item.dataset.studentId;
+            const student = students.find(s => s.id === studentId);
+            
+            if (!student) return;
+
+            if (selectedNewMembers.has(studentId)) {
+                // Deselect student
+                selectedNewMembers.delete(studentId);
+                item.classList.remove('selected');
+                // Remove avatar
+                const avatar = document.querySelector(`#selectedMembersAvatars [data-student-id="${studentId}"]`);
+                if (avatar) avatar.remove();
+            } else {
+                // Select student
+                selectedNewMembers.add(studentId);
+                item.classList.add('selected');
+                addSelectedMemberAvatar(student);
+            }
+
+            updateAddMembersConfirmButton();
+        });
+    });
 }

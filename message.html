@@ -77,6 +77,9 @@
                             <div class="chat-header-name">Select a chat to start messaging</div>
                             <div class="chat-header-participants"></div>
                         </div>
+                        <div class="chat-header-actions">
+                            <button id="addToChatBtn" class="add-to-chat-btn" title="Add to Chat" style="display: none;">+</button>
+                        </div>
                     </div>
                     <div class="chat-messages-area">
                         <div class="no-chat-selected">
@@ -123,6 +126,36 @@
                 <div class="new-chat-actions">
                     <button id="cancelNewChatBtn" class="btn-cancel">Cancel</button>
                     <button id="confirmNewChatBtn" class="btn-confirm" disabled>Create Chat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Members Modal -->
+    <div id="addMembersModalOverlay" class="modal-overlay" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header-title">
+                <h3>Add Members</h3>
+                <button id="closeAddMembersModalBtn" class="modal-close-btn" title="Close">×</button>
+            </div>
+            <div class="add-chat-container">
+                <div class="selected-students-section">
+                    <label>Selected Students</label>
+                    <div class="selected-students-container">
+                        <div class="selected-students-avatars" id="selectedMembersAvatars">
+                            <!-- Selected student avatars will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="add-users-container">
+                    <input type="search" id="searchMembersInput" placeholder="Search students to add...">
+                    <div class="students-list" id="membersSearchResults">
+                        <!-- Student search results will be dynamically populated by JS -->
+                    </div>
+                </div>
+                <div class="new-chat-actions">
+                    <button id="cancelAddMembersBtn" class="btn-cancel">Cancel</button>
+                    <button id="confirmAddMembersBtn" class="btn-confirm" disabled>Add Members</button>
                 </div>
             </div>
         </div>
