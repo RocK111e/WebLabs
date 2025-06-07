@@ -558,7 +558,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
     }
 
-    // Initialize socket connection
+    // Initialize socket connection without notification support
     initializeSocket();
 
     // Add message input event listeners
@@ -726,7 +726,7 @@ async function updateParticipantsWithStatus(participants = null) {
     }
 }
 
-// Initialize socket connection
+// Initialize socket connection without notification support
 function initializeSocket() {
     const userExternalId = sessionStorage.getItem('userExternalId');
     const username = sessionStorage.getItem('userDisplayName');
@@ -758,10 +758,19 @@ function initializeSocket() {
         console.log('Connecting user to socket');
         chatSocket.connectUser(userExternalId, username);
         
-        // Set up message listener
+        // Set up message listener with alert
         chatSocket.onNewMessage((data) => {
             console.log('New message received:', data);
             const currentChatId = getCurrentChatId();
+            const currentUserId = sessionStorage.getItem('userExternalId');
+            const senderId = data.sender?.userId || data.message.userId;
+            
+            // Don't show alert for own messages
+            if (senderId !== currentUserId) {
+                const senderName = data.sender?.username || data.message.username || 'Someone';
+                const messageText = data.message.message || data.message;
+                alert(`New message from ${senderName}:\n${messageText}`);
+            }
             
             // Only handle messages for the currently selected chat
             if (currentChatId === data.chatId) {
