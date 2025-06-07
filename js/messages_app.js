@@ -456,6 +456,18 @@ document.addEventListener("DOMContentLoaded", async function() {
         else el.textContent = "User";
     });
 
+    // Initialize bell notification state
+    const redBall = document.querySelector('.red-ball');
+    if (redBall) {
+        redBall.style.display = 'none';
+    }
+
+    // Clear existing notifications
+    const bellNotifications = document.querySelector('.bell-notifications');
+    if (bellNotifications) {
+        bellNotifications.innerHTML = '';
+    }
+
     const bellContainer = document.querySelector('.bell-container');
     const bellWrapper = document.querySelector('.bell-wrapper');
     if (bellContainer && bellWrapper) {
@@ -726,6 +738,41 @@ async function updateParticipantsWithStatus(participants = null) {
     }
 }
 
+// Bell notification functions
+function addBellNotification(senderName, messageText) {
+    const bellNotifications = document.querySelector('.bell-notifications');
+    if (!bellNotifications) return;
+
+    // Create new notification item
+    const notificationItem = document.createElement('div');
+    notificationItem.className = 'notification-item';
+    notificationItem.innerHTML = `
+        <img class="notification-icon" src="./icons/user.png" alt="User Icon">
+        <div class="notification-content">
+            <span class="notification-name">${senderName}</span>
+            <span class="notification-message">${messageText}</span>
+        </div>
+    `;
+
+    // Add to the top of the notifications list
+    bellNotifications.insertBefore(notificationItem, bellNotifications.firstChild);
+
+    // Show red dot
+    const redBall = document.querySelector('.red-ball');
+    if (redBall) {
+        redBall.style.display = 'block';
+    }
+
+    // Shake the bell
+    const bellWrapper = document.querySelector('.bell-wrapper');
+    if (bellWrapper && !bellWrapper.classList.contains('shake')) {
+        bellWrapper.classList.add('shake');
+        setTimeout(() => {
+            bellWrapper.classList.remove('shake');
+        }, 600);
+    }
+}
+
 // Initialize socket connection without notification support
 function initializeSocket() {
     const userExternalId = sessionStorage.getItem('userExternalId');
@@ -758,18 +805,18 @@ function initializeSocket() {
         console.log('Connecting user to socket');
         chatSocket.connectUser(userExternalId, username);
         
-        // Set up message listener with alert
+        // Set up message listener with bell notification
         chatSocket.onNewMessage((data) => {
             console.log('New message received:', data);
             const currentChatId = getCurrentChatId();
             const currentUserId = sessionStorage.getItem('userExternalId');
             const senderId = data.sender?.userId || data.message.userId;
             
-            // Don't show alert for own messages
+            // Don't show notification for own messages
             if (senderId !== currentUserId) {
                 const senderName = data.sender?.username || data.message.username || 'Someone';
                 const messageText = data.message.message || data.message;
-                alert(`New message from ${senderName}:\n${messageText}`);
+                addBellNotification(senderName, messageText);
             }
             
             // Only handle messages for the currently selected chat
