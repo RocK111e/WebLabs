@@ -291,14 +291,8 @@ function sendMessage(message, chatId) {
                 messageInput.value = '';
             }
             
-            // Optionally, append the message immediately for better UX
-            appendMessage({
-                chatId: chatId,
-                message: message,
-                username: username,
-                userId: userExternalId,
-                timestamp: new Date()
-            });
+            // We'll let the socket server echo back our message instead of appending it immediately
+            // This ensures consistency and prevents duplicates
         } else {
             console.error('Failed to send message through socket');
             alert('Failed to send message. Please try again.');
@@ -729,13 +723,16 @@ function initializeSocket() {
             
             // Only handle messages for the currently selected chat
             if (currentChatId === data.chatId) {
+                // Extract message data based on the server's response format
                 const messageData = {
                     chatId: data.chatId,
-                    message: data.message.message,
-                    username: data.message.username || data.sender.username,
-                    userId: data.message.userId || data.sender.userId,
-                    timestamp: new Date(data.message.createdAt)
+                    message: data.message.message || data.message, // Handle both formats
+                    username: data.sender?.username || data.message.username || data.username,
+                    userId: data.sender?.userId || data.message.userId || data.userId,
+                    timestamp: new Date(data.message.createdAt || Date.now())
                 };
+                
+                // Add the message to the UI
                 appendMessage(messageData);
             }
         });

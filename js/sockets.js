@@ -109,8 +109,9 @@ class ChatSocket {
     // Add message handler
     onNewMessage(handler) {
         this.messageHandlers.add(handler);
-        // Update message event listener to match the expected format
+        // Remove any existing listeners to prevent duplicates
         if (this.socket) {
+            this.socket.off('new_message');
             this.socket.on('new_message', (data) => {
                 console.log('Received message:', data);
                 this.messageHandlers.forEach(h => h(data));
