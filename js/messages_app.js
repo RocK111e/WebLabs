@@ -812,8 +812,8 @@ function initializeSocket() {
             const currentUserId = sessionStorage.getItem('userExternalId');
             const senderId = data.sender?.userId || data.message.userId;
             
-            // Don't show notification for own messages
-            if (senderId !== currentUserId) {
+            // Don't show notification for own messages or if user is in the same chat
+            if (senderId !== currentUserId && currentChatId !== data.chatId) {
                 const senderName = data.sender?.username || data.message.username || 'Someone';
                 const messageText = data.message.message || data.message;
                 addBellNotification(senderName, messageText);
