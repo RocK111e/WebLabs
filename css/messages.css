@@ -272,7 +272,7 @@ main {
     width: 32px;
     height: 32px;
     cursor: pointer;
-    z-index: 1; /* Add z-index to ensure proper stacking */
+    z-index: 1;
 }
 
 .participant-avatar {
@@ -280,6 +280,28 @@ main {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+}
+
+/* Status indicator */
+.participant-avatar-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    background-color: #ccc;
+    transition: background-color 0.3s ease;
+}
+
+.participant-avatar-wrapper.user-online::after {
+    background-color: #4CAF50;
+}
+
+.participant-avatar-wrapper.user-offline::after {
+    background-color: #9e9e9e;
 }
 
 /* Updated tooltip styles */

@@ -2,120 +2,152 @@
 // Socket.IO client functionality for chat application
 
 class ChatSocket {
-    constructor(serverUrl = 'http://webnode.local') {
-        // Initialize socket with server configuration
-        this.socket = io(serverUrl, {
-            path: '/socket.io/',
-            transports: ['websocket', 'polling'],
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: 5
-        });
-
-        this.setupEventListeners();
+    constructor() {
+        this.socket = null;
+        this.isConnected = false;
+        this.messageHandlers = new Set();
+        this.statusHandlers = new Set();
+        this.onlineUsers = new Set();
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 2000; // Start with 2 seconds
     }
 
-    // Initialize connection for a user
     connectUser(userId, username) {
-        if (!userId || !username) {
-            console.error('User ID and username are required for connection');
-            return;
+        try {
+            // Initialize socket connection
+            this.socket = io('http://webnode.local', {
+                reconnection: true,
+                reconnectionDelay: this.reconnectDelay,
+                reconnectionDelayMax: 10000,
+                reconnectionAttempts: this.maxReconnectAttempts
+            });
+
+            // Set up connection event handlers
+            this.socket.on('connect', () => {
+                console.log('Connected to chat server');
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+                
+                // Emit user connection event
+                this.socket.emit('user_connect', { userId, username });
+            });
+
+            // Handle reconnection
+            this.socket.on('reconnect', (attemptNumber) => {
+                console.log(`Reconnected after ${attemptNumber} attempts`);
+                this.isConnected = true;
+                this.socket.emit('user_connect', { userId, username });
+            });
+
+            this.socket.on('reconnect_attempt', (attemptNumber) => {
+                console.log(`Reconnection attempt ${attemptNumber}`);
+                if (attemptNumber > this.maxReconnectAttempts) {
+                    this.socket.disconnect();
+                    console.error('Max reconnection attempts reached');
+                }
+            });
+
+            // Handle disconnection
+            this.socket.on('disconnect', () => {
+                console.log('Disconnected from chat server');
+                this.isConnected = false;
+            });
+
+            // Set up message handling
+            this.socket.on('new_message', (data) => {
+                console.log('New message received:', data);
+                this.messageHandlers.forEach(handler => handler(data));
+            });
+
+            // Set up user status handling
+            this.socket.on('user_status', (data) => {
+                console.log('User status update:', data);
+                if (data.status === 'online') {
+                    this.onlineUsers.add(data.userId);
+                } else {
+                    this.onlineUsers.delete(data.userId);
+                }
+                this.statusHandlers.forEach(handler => handler(data));
+            });
+
+            // Handle errors
+            this.socket.on('error', (error) => {
+                console.error('Socket error:', error);
+                this.handleError(error);
+            });
+
+        } catch (error) {
+            console.error('Error initializing socket:', error);
+            this.handleError(error);
         }
-        this.socket.emit('user_connect', { userId, username });
     }
 
-    // Send a new message
+    // Send a message to the server
     sendMessage(chatId, message, username, userId) {
-        if (!chatId || !message || !username || !userId) {
-            console.error('Missing required parameters for sending message');
-            return;
+        if (!this.isConnected) {
+            console.error('Cannot send message: Not connected to server');
+            return false;
         }
-        this.socket.emit('send_message', {
-            chatId,
-            message,
-            username,
-            userId
-        });
-    }
 
-    // Setup event listeners
-    setupEventListeners() {
-        // Connection events
-        this.socket.on('connect', () => {
-            console.log('Connected to chat server');
-            // Re-establish user connection if needed
-            const userId = sessionStorage.getItem('userExternalId');
-            const username = sessionStorage.getItem('userDisplayName');
-            if (userId && username) {
-                this.connectUser(userId, username);
-            }
-        });
-
-        this.socket.on('disconnect', (reason) => {
-            console.log('Disconnected from chat server:', reason);
-            if (reason === 'io server disconnect') {
-                // Server disconnected us, try to reconnect
-                this.socket.connect();
-            }
-        });
-
-        this.socket.on('connect_error', (error) => {
-            console.error('Connection error:', error.message);
-            // If WebSocket fails, try polling
-            if (this.socket.io.engine.transport.name === 'websocket') {
-                console.log('WebSocket connection failed, falling back to polling');
-                this.socket.io.engine.transport.name = 'polling';
-            }
-        });
-
-        // General error handler
-        this.socket.on('error', (error) => {
-            console.error('Socket error:', error);
-        });
-    }
-
-    // Add message listener
-    onNewMessage(callback) {
-        this.socket.on('new_message', (data) => {
-            try {
-                // Validate received data
-                if (!data.chatId || !data.message || !data.username || !data.userId) {
-                    console.error('Received invalid message data:', data);
-                    return;
+        try {
+            this.socket.emit('new_message', {
+                chatId,
+                message: {
+                    message,
+                    username,
+                    userId,
+                    createdAt: new Date().toISOString()
                 }
-                callback(data);
-            } catch (error) {
-                console.error('Error processing new message:', error);
-            }
-        });
+            });
+            return true;
+        } catch (error) {
+            console.error('Error sending message:', error);
+            this.handleError(error);
+            return false;
+        }
     }
 
-    // Add user status listener
-    onUserStatus(callback) {
-        this.socket.on('user_status', (data) => {
-            try {
-                // Validate received data
-                if (!data.userId || !data.status) {
-                    console.error('Received invalid user status data:', data);
-                    return;
-                }
-                callback(data);
-            } catch (error) {
-                console.error('Error processing user status:', error);
-            }
-        });
+    // Add message handler
+    onNewMessage(handler) {
+        this.messageHandlers.add(handler);
     }
 
-    // Check connection status
-    isConnected() {
-        return this.socket && this.socket.connected;
+    // Add status handler
+    onUserStatus(handler) {
+        this.statusHandlers.add(handler);
     }
 
-    // Disconnect socket
+    // Remove message handler
+    removeMessageHandler(handler) {
+        this.messageHandlers.delete(handler);
+    }
+
+    // Remove status handler
+    removeStatusHandler(handler) {
+        this.statusHandlers.delete(handler);
+    }
+
+    // Check if user is online
+    isUserOnline(userId) {
+        return this.onlineUsers.has(userId);
+    }
+
+    // Handle errors
+    handleError(error) {
+        // Implement custom error handling here
+        console.error('Socket error occurred:', error);
+        // You could trigger UI updates or show notifications here
+    }
+
+    // Clean disconnect
     disconnect() {
         if (this.socket) {
             this.socket.disconnect();
+            this.isConnected = false;
+            this.messageHandlers.clear();
+            this.statusHandlers.clear();
+            this.onlineUsers.clear();
         }
     }
 }

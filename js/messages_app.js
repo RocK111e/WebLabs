@@ -15,10 +15,20 @@ import {
     send_message as send_message_http,
 } from "./api_connector.js";
 import ChatSocket from './sockets.js';
+import { 
+    processStatusData, 
+    updateUserStatus as updateStatusInMap, 
+    isUserOnline 
+} from './data_process.js';
 
 // Global state
 let selectedStudents = new Set();
 let chatSocket;
+let statusMap = {};
+
+// Cache for participant statuses
+let participantStatusCache = new Map();
+let allStudentsCache = null;
 
 // Chat list functionality
 function toggleChatList(chatList) {
@@ -151,6 +161,7 @@ async function loadAndDisplayChats() {
         document.querySelectorAll('.chat-list-item').forEach(item => {
             item.addEventListener('click', async () => {
                 const chatId = item.dataset.chatId;
+                const participants = JSON.parse(item.dataset.participants || '[]');
                 
                 // Remove active class from all chat items
                 document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active-chat'));
@@ -174,52 +185,10 @@ async function loadAndDisplayChats() {
                 
                 // Update chat name and participants
                 const chatHeaderName = chatHeader.querySelector('.chat-header-name');
-                const chatHeaderParticipants = chatHeader.querySelector('.chat-header-participants');
-                
                 chatHeaderName.textContent = chatName;
                 
-                // Update participants
-                if (chatHeaderParticipants) {
-                    try {
-                        const participantIds = JSON.parse(item.dataset.participants || '[]');
-                        console.log('Raw participant IDs:', participantIds);
-
-                        // Get all students to match with participant IDs
-                        const allStudents = await fetch_all_students();
-                        console.log('All students:', allStudents);
-
-                        // Map participant IDs to student data
-                        const participantsWithDetails = participantIds.map(participantId => {
-                            console.log('Looking up participant ID:', participantId);
-                            const studentInfo = allStudents.find(student => student.id.toString() === participantId.toString());
-                            console.log('Found student info:', studentInfo);
-                            return studentInfo ? {
-                                id: studentInfo.id,
-                                name: studentInfo.Name,
-                                surname: studentInfo.Surname
-                            } : {
-                                id: participantId,
-                                name: 'Unknown',
-                                surname: 'User'
-                            };
-                        });
-
-                        console.log('Final participants with details:', participantsWithDetails);
-
-                        // Update the header with participant details
-                        chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => `
-                            <div class="participant-avatar-wrapper" data-participant-id="${participant.id}">
-                                <img src="./icons/user.png" 
-                                     alt="${participant.name}" 
-                                     class="participant-avatar">
-                                <div class="tooltip">${participant.name} ${participant.surname}</div>
-                            </div>
-                        `).join('');
-                    } catch (error) {
-                        console.error('Error updating participants:', error);
-                        chatHeaderParticipants.innerHTML = '';
-                    }
-                }
+                // Fetch initial participant status when entering chat
+                await fetchParticipantStatus(chatId);
                 
                 // Load messages for the selected chat
                 await loadChatMessages(chatId);
@@ -296,7 +265,7 @@ async function handleCreateChat() {
 function sendMessage(message, chatId) {
     if (!message.trim() || !chatId) return;
 
-    if (chatSocket && chatSocket.isConnected()) {
+    if (chatSocket && chatSocket.isConnected) {
         const userExternalId = sessionStorage.getItem('userExternalId');
         const username = sessionStorage.getItem('userDisplayName') || 'User';
         
@@ -359,9 +328,10 @@ function appendMessage(data) {
     if (!messagesArea) return;
 
     const currentUserId = sessionStorage.getItem('userExternalId');
+    const isOwnMessage = data.userId === currentUserId;
     
     const messageElement = document.createElement('div');
-    messageElement.className = 'message-item';
+    messageElement.className = `message-item ${isOwnMessage ? 'sent' : 'received'}`;
     
     const messageContent = document.createElement('div');
     messageContent.className = 'message-content';
@@ -375,11 +345,11 @@ function appendMessage(data) {
     
     const senderName = document.createElement('span');
     senderName.className = 'message-sender';
-    senderName.textContent = data.userId === currentUserId ? 'You' : data.username;
+    senderName.textContent = isOwnMessage ? 'You' : data.username;
     
     const timestamp = document.createElement('span');
     timestamp.className = 'message-time';
-    timestamp.textContent = (data.timestamp || new Date()).toLocaleTimeString([], { 
+    timestamp.textContent = data.timestamp.toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit' 
     });
@@ -552,6 +522,138 @@ function getCurrentChatId() {
     return activeChatElement ? activeChatElement.dataset.chatId : null;
 }
 
+// Function to update user status in the UI
+function updateUserStatus(userId, status) {
+    console.log('Updating status for user:', userId, 'to:', status);
+    // Convert userId to string for consistent comparison
+    userId = userId.toString();
+    
+    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
+    console.log('Found participant element:', participantElement);
+    
+    if (participantElement) {
+        const currentUserId = sessionStorage.getItem('userExternalId').toString();
+        // If this is the current user, always show as online
+        if (userId === currentUserId) {
+            status = 'online';
+        }
+        
+        console.log('Applying status class:', `user-${status}`);
+        // Remove existing status classes
+        participantElement.classList.remove('user-online', 'user-offline');
+        // Add new status class
+        participantElement.classList.add(`user-${status}`);
+    }
+}
+
+// Fetch initial participant status
+async function fetchParticipantStatus(chatId) {
+    try {
+        // Get all students data if not cached
+        if (!allStudentsCache) {
+            allStudentsCache = await fetch_all_students();
+        }
+        
+        if (!allStudentsCache) {
+            console.log('Could not fetch students data');
+            return null;
+        }
+
+        console.log('Processing students data for status:', allStudentsCache);
+        
+        // Update cache with received statuses
+        allStudentsCache.forEach(student => {
+            const userId = student.id.toString();
+            // Current user is always online
+            const isOnline = userId === sessionStorage.getItem('userExternalId') || student.isOnline;
+            console.log('Caching status:', { userId, isOnline });
+            participantStatusCache.set(userId, isOnline);
+        });
+        
+        // Update UI with new statuses
+        updateParticipantsWithStatus();
+        
+        return allStudentsCache;
+    } catch (error) {
+        console.error('Error in fetchParticipantStatus:', error);
+        return null;
+    }
+}
+
+// Update single participant status
+function updateParticipantStatus(userId, isOnline) {
+    userId = userId.toString();
+    participantStatusCache.set(userId, isOnline);
+    
+    // Update the cached student data if it exists
+    if (allStudentsCache) {
+        const student = allStudentsCache.find(s => s.id.toString() === userId);
+        if (student) {
+            student.isOnline = isOnline;
+        }
+    }
+    
+    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
+    if (participantElement) {
+        // Remove existing status classes
+        participantElement.classList.remove('user-online', 'user-offline');
+        // Add new status class
+        participantElement.classList.add(`user-${isOnline ? 'online' : 'offline'}`);
+    }
+}
+
+// Update the chat header participants with online status indicators
+async function updateParticipantsWithStatus(participants = null) {
+    const chatHeaderParticipants = document.querySelector('.chat-header-participants');
+    if (!chatHeaderParticipants) return;
+
+    try {
+        // If no participants provided, get them from current chat
+        if (!participants) {
+            const currentChatItem = document.querySelector('.chat-list-item.active-chat');
+            if (currentChatItem) {
+                participants = JSON.parse(currentChatItem.dataset.participants || '[]');
+            } else {
+                return;
+            }
+        }
+
+        // Ensure we have status data
+        if (Object.keys(statusMap).length === 0) {
+            await initializeStatusData();
+        }
+
+        const participantsWithDetails = participants.map(participantId => {
+            participantId = participantId.toString();
+            const userStatus = statusMap[participantId];
+            
+            return userStatus ? {
+                id: participantId,
+                name: userStatus.name,
+                surname: userStatus.surname,
+                status: userStatus.isOnline ? 'online' : 'offline'
+            } : {
+                id: participantId,
+                name: 'Unknown',
+                surname: 'User',
+                status: 'offline'
+            };
+        });
+
+        chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => `
+            <div class="participant-avatar-wrapper user-${participant.status}" data-participant-id="${participant.id}">
+                <img src="./icons/user.png" 
+                     alt="${participant.name}" 
+                     class="participant-avatar">
+                <div class="tooltip">${participant.name} ${participant.surname}</div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error updating participants:', error);
+        chatHeaderParticipants.innerHTML = '';
+    }
+}
+
 // Initialize socket connection
 function initializeSocket() {
     const userExternalId = sessionStorage.getItem('userExternalId');
@@ -570,14 +672,53 @@ function initializeSocket() {
         
         // Only handle messages for the currently selected chat
         if (currentChatId === data.chatId) {
-            appendMessage(data);
+            const messageData = {
+                chatId: data.chatId,
+                message: data.message.message,
+                username: data.message.username,
+                userId: data.message.userId,
+                timestamp: new Date(data.message.createdAt)
+            };
+            appendMessage(messageData);
         }
     });
 
     // Set up user status listener
     chatSocket.onUserStatus((data) => {
-        // TODO: Implement user status update logic
-        console.log(`User ${data.userId} is ${data.status}`);
-        // You would update the UI to show user's online/offline status
+        const userId = data.userId.toString();
+        const isOnline = data.status === 'online';
+        
+        // Don't update status if it's the current user (they're always online)
+        if (userId !== userExternalId) {
+            // Update status map and UI
+            statusMap = updateStatusInMap(statusMap, userId, isOnline);
+            updateParticipantStatusUI(userId);
+        }
     });
+
+    // Initialize status data
+    initializeStatusData();
+}
+
+// Initialize status data
+async function initializeStatusData() {
+    const students = await fetch_all_students();
+    if (students) {
+        statusMap = processStatusData(students);
+        console.log('Initialized status map:', statusMap);
+    }
+}
+
+// Update single participant status in UI
+function updateParticipantStatusUI(userId) {
+    userId = userId.toString();
+    const isOnline = isUserOnline(statusMap, userId);
+    
+    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
+    if (participantElement) {
+        // Remove existing status classes
+        participantElement.classList.remove('user-online', 'user-offline');
+        // Add new status class
+        participantElement.classList.add(`user-${isOnline ? 'online' : 'offline'}`);
+    }
 }

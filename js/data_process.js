@@ -186,3 +186,61 @@ export async function put_item_to_table(id, group, first_name, last_name, gender
     update_main_cb();
     update_buttons();
 }
+
+/**
+ * Processes student data to extract only status-related information
+ * @param {Array} students - Array of student objects from PHP API
+ * @returns {Object} Object with userId as key and status info as value
+ */
+export function processStatusData(students) {
+    if (!Array.isArray(students)) {
+        console.error('processStatusData: Invalid input - expected array of students');
+        return {};
+    }
+
+    const currentUserId = sessionStorage.getItem('userExternalId')?.toString();
+    
+    // Create a map of user IDs to their basic info and status
+    const statusMap = {};
+    
+    students.forEach(student => {
+        const userId = student.id.toString();
+        statusMap[userId] = {
+            userId: userId,
+            name: student.Name,
+            surname: student.Surname,
+            // Use Status field from PHP API ('t' for online, 'f' for offline)
+            // Current user is always online
+            isOnline: userId === currentUserId || student.Status === 't'
+        };
+    });
+
+    console.log('Processed status data:', statusMap);
+    return statusMap;
+}
+
+/**
+ * Updates status for a specific user in the status map
+ * @param {Object} statusMap - The current status map
+ * @param {string} userId - The user ID to update
+ * @param {boolean} isOnline - The new online status
+ * @returns {Object} Updated status map
+ */
+export function updateUserStatus(statusMap, userId, isOnline) {
+    userId = userId.toString();
+    if (statusMap && statusMap[userId]) {
+        statusMap[userId].isOnline = isOnline;
+    }
+    return statusMap;
+}
+
+/**
+ * Gets online status for a specific user
+ * @param {Object} statusMap - The current status map
+ * @param {string} userId - The user ID to check
+ * @returns {boolean} True if user is online, false otherwise
+ */
+export function isUserOnline(statusMap, userId) {
+    userId = userId.toString();
+    return statusMap[userId]?.isOnline || false;
+}

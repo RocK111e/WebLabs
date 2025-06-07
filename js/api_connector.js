@@ -4,7 +4,7 @@ const php_api_prefix = 'http://webphp.local/api/app.php'; // PHP API base
 const node_api_prefix = 'http://webnode.local';          // Node.js chat API base
 
 // --- Student API functions (Used for fetching user details for chat) ---
-export async function fetch_all_students() { // Used to populate user list for new chats
+export async function fetch_all_students() { // Used to populate user list for new chats and get online status
     console.log("[API] fetch_all_students called");
     const token = sessionStorage.getItem('token');
     if (!token) {
@@ -36,7 +36,10 @@ export async function fetch_all_students() { // Used to populate user list for n
             return false;
         }
         console.log("[API] fetch_all_students success, data:", data);
-        return data;
+        return data.map(student => ({
+            ...student,
+            isOnline: false // Default status is offline
+        }));
     } catch (error) {
         console.error("[API] Network error fetching students:", error);
         return false;
