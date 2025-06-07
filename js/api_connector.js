@@ -279,6 +279,38 @@ export async function fetch_my_chats() {
             return [];
         }
         const chats = await response.json();
+        
+        // Fetch all students to get their details
+        const allStudents = await fetch_all_students();
+        if (allStudents) {
+            // Create a map of students by their ID for faster lookup
+            const studentMap = new Map(allStudents.map(student => [
+                student.id.toString(),
+                {
+                    id: student.id,
+                    name: student.Name,
+                    surname: student.Surname,
+                    group: student.Group,
+                    avatarUrl: student.avatarUrl || './icons/user.png'
+                }
+            ]));
+
+            // Enhance each chat with participant details
+            chats.forEach(chat => {
+                if (chat.participants) {
+                    chat.participants = chat.participants.map(participantId => {
+                        const studentInfo = studentMap.get(participantId.toString());
+                        return studentInfo || {
+                            id: participantId,
+                            name: 'Unknown',
+                            surname: 'User',
+                            avatarUrl: './icons/user.png'
+                        };
+                    });
+                }
+            });
+        }
+
         console.log("[API CHAT] fetch_my_chats success, data:", chats);
         return Array.isArray(chats) ? chats : [];
     } catch (error) {

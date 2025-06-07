@@ -226,9 +226,10 @@ main {
     padding: 0 15px;
     background-color: #f0f2f5;
     border-bottom: 1px solid var(--light-gray, #ddd);
-    height: 60px; /* Explicit height */
+    height: 60px;
     flex-shrink: 0;
-    box-sizing: border-box; /* Ensures padding and border are within the height */
+    box-sizing: border-box;
+    overflow: visible !important; /* Add this to prevent tooltip clipping */
 }
 
 .chat-list-toggle-btn {
@@ -246,37 +247,76 @@ main {
 .chat-header-info {
     display: flex;
     align-items: center;
-    gap: 15px; /* Gap between name and participants block */
     flex-grow: 1;
-    min-width: 0; /* Important for flex children to shrink */
+    gap: 15px;
+    margin-left: 10px;
+    overflow: visible !important; /* Add this to prevent tooltip clipping */
 }
 
-.chat-header-name { /* Group name in chat header */
-    font-size: 17px;
-    font-weight: 600;
-    color: #111;
+.chat-header-name {
+    font-weight: 500;
+    font-size: 16px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-shrink: 1; /* Allow name to shrink if participant icons take space */
+    flex-shrink: 0;
 }
 
 .chat-header-participants {
     display: flex;
     align-items: center;
-    gap: 4px; /* Spacing between participant icons */
-    flex-shrink: 0; /* Don't shrink this container */
-    margin-left: auto; /* Pushes it towards the chat actions if space is tight */
-    overflow: hidden; /* Hides icons that don't fit if not using a "+N" indicator */
+    gap: 4px;
+    overflow: visible !important; /* Add this to prevent tooltip clipping */
+}
+
+.participant-avatar-wrapper {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    z-index: 1; /* Add z-index to ensure proper stacking */
 }
 
 .participant-avatar {
-    width: 32px; /* Size of participant icons in header */
-    height: 32px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    flex-shrink: 0; /* Prevent icons from shrinking */
+}
+
+/* Updated tooltip styles */
+.participant-avatar-wrapper .tooltip {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.participant-avatar-wrapper:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    display: block; /* Ensure tooltip is displayed */
+}
+
+/* Add arrow to tooltip */
+.participant-avatar-wrapper .tooltip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 4px 4px 4px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
 }
 
 .chat-header-actions {
@@ -300,7 +340,21 @@ main {
 .message-item {
     display: flex;
     max-width: 75%;
-    align-items: flex-end; /* Aligns timestamp correctly at the bottom */
+    align-items: flex-end;
+    align-self: flex-start;
+    animation: messageAppear 0.3s ease-out;
+    opacity: 1;
+}
+
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message-avatar { /* Individual message avatars are hidden for group chat */
@@ -345,6 +399,9 @@ main {
     word-wrap: break-word;
     font-size: 14px;
     line-height: 1.4;
+    background-color: #e9ecef;
+    color: #212529;
+    border-bottom-left-radius: 4px;
 }
 
 .message-item.sent .message-bubble {
@@ -369,10 +426,15 @@ main {
 
 .message-sender {
     font-weight: 500;
+    color: #2196f3;
 }
 
 .message-time {
     color: #888;
+}
+
+.message-item.sent .message-sender {
+    color: #1976d2;
 }
 
 .message-timestamp {
@@ -706,7 +768,7 @@ main {
      .chat-header-info {
         gap: 8px; /* Reduce gap on smaller screens */
     }
-    .participant-avatar {
+    .participant-avatar-wrapper {
         width: 28px;
         height: 28px;
     }
@@ -735,7 +797,7 @@ main {
     .chat-header-name {
         font-size: 16px;
     }
-    .participant-avatar {
+    .participant-avatar-wrapper {
         width: 24px;
         height: 24px;
     }
@@ -763,6 +825,11 @@ main {
     .added-users-icons {
         justify-content: flex-start; /* Align icons to the left */
         margin-top: 10px;
+    }
+
+    .participant-tooltip {
+        font-size: 10px;
+        padding: 3px 6px;
     }
 }
 

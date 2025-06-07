@@ -12,7 +12,7 @@ import {
     fetch_all_students, 
     create_chat,
     fetch_chat_messages,
-    send_message as send_message_http
+    send_message as send_message_http,
 } from "./api_connector.js";
 import ChatSocket from './sockets.js';
 
@@ -128,18 +128,24 @@ async function loadAndDisplayChats() {
     const chatListItems = document.querySelector('.chat-list-items');
     const chatListEmpty = document.querySelector('.chat-list-empty-placeholder');
     const chats = await fetch_my_chats();
+    console.log('Fetched chats:', chats);
     
     if (chats && chats.length > 0) {
         chatListItems.style.display = 'block';
         chatListEmpty.style.display = 'none';
         
-        chatListItems.innerHTML = chats.map(chat => `
-            <div class="chat-list-item" data-chat-id="${chat._id}">
-                <div class="chat-item-details">
-                    <div class="chat-name">${chat.chatName || 'Unnamed Chat'}</div>
+        chatListItems.innerHTML = chats.map(chat => {
+            console.log('Processing chat:', chat);
+            return `
+                <div class="chat-list-item" 
+                     data-chat-id="${chat._id}"
+                     data-participants='${JSON.stringify(chat.userIds || [])}'>
+                    <div class="chat-item-details">
+                        <div class="chat-name">${chat.chatName || 'Unnamed Chat'}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         // Add click handlers for chat items
         document.querySelectorAll('.chat-list-item').forEach(item => {
@@ -151,12 +157,72 @@ async function loadAndDisplayChats() {
                 // Add active class to selected chat
                 item.classList.add('active-chat');
                 
+                // Update chat header with chat name and participants
+                const chatName = item.querySelector('.chat-name').textContent;
+                const chatHeader = document.querySelector('.chat-header');
+                
+                // Create chat header structure if it doesn't exist
+                if (!chatHeader.querySelector('.chat-header-info')) {
+                    chatHeader.innerHTML = `
+                        <button class="chat-list-toggle-btn">☰</button>
+                        <div class="chat-header-info">
+                            <div class="chat-header-name"></div>
+                            <div class="chat-header-participants"></div>
+                        </div>
+                    `;
+                }
+                
+                // Update chat name and participants
+                const chatHeaderName = chatHeader.querySelector('.chat-header-name');
+                const chatHeaderParticipants = chatHeader.querySelector('.chat-header-participants');
+                
+                chatHeaderName.textContent = chatName;
+                
+                // Update participants
+                if (chatHeaderParticipants) {
+                    try {
+                        const participantIds = JSON.parse(item.dataset.participants || '[]');
+                        console.log('Raw participant IDs:', participantIds);
+
+                        // Get all students to match with participant IDs
+                        const allStudents = await fetch_all_students();
+                        console.log('All students:', allStudents);
+
+                        // Map participant IDs to student data
+                        const participantsWithDetails = participantIds.map(participantId => {
+                            console.log('Looking up participant ID:', participantId);
+                            const studentInfo = allStudents.find(student => student.id.toString() === participantId.toString());
+                            console.log('Found student info:', studentInfo);
+                            return studentInfo ? {
+                                id: studentInfo.id,
+                                name: studentInfo.Name,
+                                surname: studentInfo.Surname
+                            } : {
+                                id: participantId,
+                                name: 'Unknown',
+                                surname: 'User'
+                            };
+                        });
+
+                        console.log('Final participants with details:', participantsWithDetails);
+
+                        // Update the header with participant details
+                        chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => `
+                            <div class="participant-avatar-wrapper" data-participant-id="${participant.id}">
+                                <img src="./icons/user.png" 
+                                     alt="${participant.name}" 
+                                     class="participant-avatar">
+                                <div class="tooltip">${participant.name} ${participant.surname}</div>
+                            </div>
+                        `).join('');
+                    } catch (error) {
+                        console.error('Error updating participants:', error);
+                        chatHeaderParticipants.innerHTML = '';
+                    }
+                }
+                
                 // Load messages for the selected chat
                 await loadChatMessages(chatId);
-                
-                // Update chat header with chat name
-                const chatName = item.querySelector('.chat-name').textContent;
-                document.querySelector('.chat-header-name').textContent = chatName;
                 
                 // On mobile, close the chat list after selection
                 const chatList = document.querySelector('.chat-list');
@@ -243,6 +309,7 @@ function sendMessage(message, chatId) {
 
 async function loadChatMessages(chatId) {
     const messagesArea = document.querySelector('.chat-messages-area');
+    const chatHeaderParticipants = document.querySelector('.chat-header-participants');
     if (!messagesArea || !chatId) return;
 
     try {
@@ -251,41 +318,30 @@ async function loadChatMessages(chatId) {
         // Show loading state
         messagesArea.innerHTML = '<div class="loading-messages">Loading messages...</div>';
         
+        // Get the current chat's data from the chat list
+        const currentChat = Array.from(document.querySelectorAll('.chat-list-item'))
+            .find(item => item.dataset.chatId === chatId);
+            
+        if (!currentChat) {
+            console.error('Could not find chat data for:', chatId);
+            return;
+        }
+        
+        // Fetch messages
         const messages = await fetch_chat_messages(chatId);
         
-        // Clear loading state and previous messages
+        // Clear loading state
         messagesArea.innerHTML = '';
         
         // Display messages
         messages.forEach(msg => {
-            const messageElement = document.createElement('div');
-            messageElement.className = `message-item ${msg.senderExternalId === currentUserId ? 'sent' : 'received'}`;
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            
-            const messageBubble = document.createElement('div');
-            messageBubble.className = 'message-bubble';
-            messageBubble.textContent = msg.message;
-            
-            const messageInfo = document.createElement('div');
-            messageInfo.className = 'message-info';
-            
-            const senderName = document.createElement('span');
-            senderName.className = 'message-sender';
-            senderName.textContent = msg.username || 'Unknown User';
-            
-            const timestamp = document.createElement('span');
-            timestamp.className = 'message-time';
-            timestamp.textContent = new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            messageInfo.appendChild(senderName);
-            messageInfo.appendChild(timestamp);
-            messageContent.appendChild(messageBubble);
-            messageContent.appendChild(messageInfo);
-            messageElement.appendChild(messageContent);
-            
-            messagesArea.appendChild(messageElement);
+            appendMessage({
+                chatId,
+                message: msg.message,
+                username: msg.username || 'Unknown User',
+                userId: msg.senderExternalId,
+                timestamp: new Date(msg.createdAt)
+            });
         });
         
         // Scroll to the bottom of messages
@@ -295,6 +351,49 @@ async function loadChatMessages(chatId) {
         console.error('Error loading messages:', error);
         messagesArea.innerHTML = '<div class="error-message">Failed to load messages. Please try again.</div>';
     }
+}
+
+// Function to append a new message to the chat
+function appendMessage(data) {
+    const messagesArea = document.querySelector('.chat-messages-area');
+    if (!messagesArea) return;
+
+    const currentUserId = sessionStorage.getItem('userExternalId');
+    
+    const messageElement = document.createElement('div');
+    messageElement.className = 'message-item';
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    
+    const messageBubble = document.createElement('div');
+    messageBubble.className = 'message-bubble';
+    messageBubble.textContent = data.message;
+    
+    const messageInfo = document.createElement('div');
+    messageInfo.className = 'message-info';
+    
+    const senderName = document.createElement('span');
+    senderName.className = 'message-sender';
+    senderName.textContent = data.userId === currentUserId ? 'You' : data.username;
+    
+    const timestamp = document.createElement('span');
+    timestamp.className = 'message-time';
+    timestamp.textContent = (data.timestamp || new Date()).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    messageInfo.appendChild(senderName);
+    messageInfo.appendChild(timestamp);
+    messageContent.appendChild(messageBubble);
+    messageContent.appendChild(messageInfo);
+    messageElement.appendChild(messageContent);
+    
+    messagesArea.appendChild(messageElement);
+    
+    // Scroll to the new message
+    messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
 // Initialize everything when the DOM is loaded
@@ -471,40 +570,7 @@ function initializeSocket() {
         
         // Only handle messages for the currently selected chat
         if (currentChatId === data.chatId) {
-            const messagesArea = document.querySelector('.chat-messages-area');
-            if (!messagesArea) return;
-
-            const messageElement = document.createElement('div');
-            messageElement.className = `message-item ${data.userId === userExternalId ? 'sent' : 'received'}`;
-            
-            const messageContent = document.createElement('div');
-            messageContent.className = 'message-content';
-            
-            const messageBubble = document.createElement('div');
-            messageBubble.className = 'message-bubble';
-            messageBubble.textContent = data.message;
-            
-            const messageInfo = document.createElement('div');
-            messageInfo.className = 'message-info';
-            
-            const senderName = document.createElement('span');
-            senderName.className = 'message-sender';
-            senderName.textContent = data.username || 'Unknown User';
-            
-            const timestamp = document.createElement('span');
-            timestamp.className = 'message-time';
-            timestamp.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            messageInfo.appendChild(senderName);
-            messageInfo.appendChild(timestamp);
-            messageContent.appendChild(messageBubble);
-            messageContent.appendChild(messageInfo);
-            messageElement.appendChild(messageContent);
-            
-            messagesArea.appendChild(messageElement);
-            
-            // Scroll to the bottom
-            messagesArea.scrollTop = messagesArea.scrollHeight;
+            appendMessage(data);
         }
     });
 
