@@ -1036,11 +1036,14 @@ async function updateParticipantsWithStatus(participants = null) {
         chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => {
             const fullName = `${participant.name} ${participant.surname}`;
             return `
-                <div class="participant-avatar-wrapper user-${participant.status}" data-participant-id="${participant.id}">
-                    <img src="./icons/user.png" 
-                         alt="${fullName}" 
-                         class="participant-avatar">
-                    <div class="tooltip">${fullName}</div>
+                <div class="participant-avatar-wrapper" data-participant-id="${participant.id}">
+                    <div class="image-status">
+                        <img src="./icons/user.png" 
+                            alt="${fullName}" 
+                            class="participant-avatar">
+                        <div class="user-${participant.status}"></div>
+                        <span class="user-name-image" >${fullName}</span>
+                    </div>
                 </div>
             `;
         }).join('');
@@ -1115,8 +1118,6 @@ async function handleAddMembers() {
             await updateParticipantsWithStatus(updatedChat.userIds);
         }
         
-        // Show success message
-        showNotification('Members added successfully', 'success');
         
         // Close modal and reset selection
         modal.style.display = 'none';
@@ -1132,7 +1133,6 @@ async function handleAddMembers() {
 
     } catch (error) {
         console.error('Error adding members:', error);
-        showNotification(error.message || 'Failed to add members. Please try again.', 'error');
     } finally {
         // Reset button state
         confirmButton.disabled = false;
@@ -1140,28 +1140,6 @@ async function handleAddMembers() {
     }
 }
 
-// Add notification function
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.textContent = message;
-    
-    // Add notification container if it doesn't exist
-    let container = document.querySelector('.notification-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.className = 'notification-container';
-        document.body.appendChild(container);
-    }
-    
-    container.appendChild(notification);
-    
-    // Remove notification after 3 seconds
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
 
 // Add this function to update the confirm button state
 function updateAddMembersConfirmButton() {
