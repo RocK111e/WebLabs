@@ -360,8 +360,9 @@ function appendMessage(data) {
     const timestamp = document.createElement('span');
     timestamp.className = 'message-time';
     timestamp.textContent = data.timestamp.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
     });
     timestamp.style.color = '#6c757d';
     
