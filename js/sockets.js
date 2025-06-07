@@ -91,14 +91,12 @@ class ChatSocket {
         }
 
         try {
-            this.socket.emit('new_message', {
-                chatId,
-                message: {
-                    message,
-                    username,
-                    userId,
-                    createdAt: new Date().toISOString()
-                }
+            // Format according to required Socket.IO event format
+            this.socket.emit('send_message', {
+                chatId: chatId,
+                message: message,
+                username: username,
+                userId: userId
             });
             return true;
         } catch (error) {
@@ -111,6 +109,13 @@ class ChatSocket {
     // Add message handler
     onNewMessage(handler) {
         this.messageHandlers.add(handler);
+        // Update message event listener to match the expected format
+        if (this.socket) {
+            this.socket.on('new_message', (data) => {
+                console.log('Received message:', data);
+                this.messageHandlers.forEach(h => h(data));
+            });
+        }
     }
 
     // Add status handler

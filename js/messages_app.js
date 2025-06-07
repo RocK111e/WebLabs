@@ -263,15 +263,51 @@ async function handleCreateChat() {
 
 // Function to send a message
 function sendMessage(message, chatId) {
-    if (!message.trim() || !chatId) return;
+    console.log('Attempting to send message:', { message, chatId });
+    
+    if (!message.trim() || !chatId) {
+        console.log('Message or chatId is empty, aborting send');
+        return;
+    }
+
+    console.log('Socket state:', { 
+        socketExists: !!chatSocket,
+        isConnected: chatSocket?.isConnected,
+        socket: chatSocket?.socket
+    });
 
     if (chatSocket && chatSocket.isConnected) {
         const userExternalId = sessionStorage.getItem('userExternalId');
         const username = sessionStorage.getItem('userDisplayName') || 'User';
         
-        chatSocket.sendMessage(chatId, message, username, userExternalId);
+        console.log('Sending message with:', { userExternalId, username });
+        const result = chatSocket.sendMessage(chatId, message, username, userExternalId);
+        
+        // If the message was sent successfully through the socket
+        if (result) {
+            // Clear the input field
+            const messageInput = document.querySelector('.message-input');
+            if (messageInput) {
+                messageInput.value = '';
+            }
+            
+            // Optionally, append the message immediately for better UX
+            appendMessage({
+                chatId: chatId,
+                message: message,
+                username: username,
+                userId: userExternalId,
+                timestamp: new Date()
+            });
+        } else {
+            console.error('Failed to send message through socket');
+            alert('Failed to send message. Please try again.');
+        }
     } else {
-        console.error('Socket not connected. Cannot send message.');
+        console.error('Socket not connected. Cannot send message.', {
+            socketExists: !!chatSocket,
+            isConnected: chatSocket?.isConnected
+        });
         alert('Connection error. Please try again.');
     }
 }
@@ -658,46 +694,72 @@ async function updateParticipantsWithStatus(participants = null) {
 function initializeSocket() {
     const userExternalId = sessionStorage.getItem('userExternalId');
     const username = sessionStorage.getItem('userDisplayName');
+    
+    console.log('Initializing socket with:', { userExternalId, username });
+    
     if (!userExternalId) {
         console.error('User ID not found in session storage');
         return;
     }
 
-    chatSocket = new ChatSocket();
-    chatSocket.connectUser(userExternalId, username);
-
-    // Set up message listener
-    chatSocket.onNewMessage((data) => {
-        const currentChatId = getCurrentChatId();
+    try {
+        console.log('Creating new ChatSocket instance');
+        chatSocket = new ChatSocket();
         
-        // Only handle messages for the currently selected chat
-        if (currentChatId === data.chatId) {
-            const messageData = {
-                chatId: data.chatId,
-                message: data.message.message,
-                username: data.message.username,
-                userId: data.message.userId,
-                timestamp: new Date(data.message.createdAt)
-            };
-            appendMessage(messageData);
-        }
-    });
-
-    // Set up user status listener
-    chatSocket.onUserStatus((data) => {
-        const userId = data.userId.toString();
-        const isOnline = data.status === 'online';
+        // Add connection state change listener
+        chatSocket.socket?.on('connect', () => {
+            console.log('Socket connected successfully');
+        });
         
-        // Don't update status if it's the current user (they're always online)
-        if (userId !== userExternalId) {
-            // Update status map and UI
-            statusMap = updateStatusInMap(statusMap, userId, isOnline);
-            updateParticipantStatusUI(userId);
-        }
-    });
+        chatSocket.socket?.on('disconnect', () => {
+            console.log('Socket disconnected');
+        });
+        
+        chatSocket.socket?.on('error', (error) => {
+            console.error('Socket error:', error);
+        });
+        
+        console.log('Connecting user to socket');
+        chatSocket.connectUser(userExternalId, username);
+        
+        // Set up message listener
+        chatSocket.onNewMessage((data) => {
+            console.log('New message received:', data);
+            const currentChatId = getCurrentChatId();
+            
+            // Only handle messages for the currently selected chat
+            if (currentChatId === data.chatId) {
+                const messageData = {
+                    chatId: data.chatId,
+                    message: data.message.message,
+                    username: data.message.username || data.sender.username,
+                    userId: data.message.userId || data.sender.userId,
+                    timestamp: new Date(data.message.createdAt)
+                };
+                appendMessage(messageData);
+            }
+        });
 
-    // Initialize status data
-    initializeStatusData();
+        // Set up user status listener
+        chatSocket.onUserStatus((data) => {
+            const userId = data.userId.toString();
+            const isOnline = data.status === 'online';
+            
+            // Don't update status if it's the current user (they're always online)
+            if (userId !== userExternalId) {
+                // Update status map and UI
+                statusMap = updateStatusInMap(statusMap, userId, isOnline);
+                updateParticipantStatusUI(userId);
+            }
+        });
+
+        // Initialize status data
+        initializeStatusData();
+        
+        console.log('Socket initialization completed');
+    } catch (error) {
+        console.error('Error during socket initialization:', error);
+    }
 }
 
 // Initialize status data
