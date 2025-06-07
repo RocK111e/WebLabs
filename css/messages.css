@@ -802,11 +802,31 @@ main {
         padding-left: 10px;
         padding-right: 10px;
     }
-     .chat-header-info {
+     /* In css/messages.css, inside the @media screen and (max-width: 768px) block */
+
+    .chat-header-info {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none; /* Firefox */
         -ms-overflow-style: none; /* IE and Edge */
+
+        /* === FIX STARTS HERE === */
+        /* Add padding to the bottom to make room for the tooltip */
+        padding-bottom: 35px;
+        /* Use a negative margin to pull the content below it back up, avoiding a large gap */
+        margin-bottom: -35px;
+        /* Clip the content on the X-axis, but not the Y-axis */
+        overflow-y: visible; 
+        /* === FIX ENDS HERE === */
+    }
+
+    /* You also no longer need the !important rule on the child */
+    .chat-header-participants {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        /* overflow: visible !important;  <-- This rule is ineffective and can be removed */
+        flex-wrap: nowrap; /* Prevent wrapping */
     }
     
     .chat-header-info::-webkit-scrollbar {

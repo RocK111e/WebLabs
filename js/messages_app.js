@@ -994,28 +994,6 @@ async function fetchParticipantStatus(chatId) {
     }
 }
 
-// Update single participant status
-function updateParticipantStatus(userId, isOnline) {
-    userId = userId.toString();
-    participantStatusCache.set(userId, isOnline);
-    
-    // Update the cached student data if it exists
-    if (allStudentsCache) {
-        const student = allStudentsCache.find(s => s.id.toString() === userId);
-        if (student) {
-            student.isOnline = isOnline;
-        }
-    }
-    
-    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
-    if (participantElement) {
-        // Remove existing status classes
-        participantElement.classList.remove('user-online', 'user-offline');
-        // Add new status class
-        participantElement.classList.add(`user-${isOnline ? 'online' : 'offline'}`);
-    }
-}
-
 // Update the chat header participants with online status indicators
 async function updateParticipantsWithStatus(participants = null) {
     const chatHeaderParticipants = document.querySelector('.chat-header-participants');
@@ -1070,32 +1048,6 @@ async function updateParticipantsWithStatus(participants = null) {
     } catch (error) {
         console.error('Error updating participants:', error);
         chatHeaderParticipants.innerHTML = '';
-    }
-}
-
-function showChat(chatId) {
-    currentChatId = chatId;
-    const chat = chats.find(c => c.id === chatId);
-    if (chat) {
-        document.querySelector('.chat-header-name').textContent = chat.name;
-        document.querySelector('.chat-messages-area').innerHTML = ''; // Clear messages
-        
-        // Show add button
-        const addButton = document.getElementById('addToChatBtn');
-        if (addButton) {
-            addButton.style.display = 'flex';
-        }
-        
-        loadChatMessages(chatId);
-    } else {
-        document.querySelector('.chat-header-name').textContent = 'Select a chat to start messaging';
-        document.querySelector('.chat-messages-area').innerHTML = '';
-        
-        // Hide add button
-        const addButton = document.getElementById('addToChatBtn');
-        if (addButton) {
-            addButton.style.display = 'none';
-        }
     }
 }
 
@@ -1176,6 +1128,8 @@ async function handleAddMembers() {
             selectedAvatarsContainer.innerHTML = '';
         }
         
+        fetchParticipantStatus(currentChatId);
+
     } catch (error) {
         console.error('Error adding members:', error);
         showNotification(error.message || 'Failed to add members. Please try again.', 'error');
