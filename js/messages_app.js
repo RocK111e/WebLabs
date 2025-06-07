@@ -739,13 +739,15 @@ async function updateParticipantsWithStatus(participants = null) {
 }
 
 // Bell notification functions
-function addBellNotification(senderName, messageText) {
+function addBellNotification(senderName, messageText, chatId) {
     const bellNotifications = document.querySelector('.bell-notifications');
     if (!bellNotifications) return;
 
     // Create new notification item
     const notificationItem = document.createElement('div');
     notificationItem.className = 'notification-item';
+    notificationItem.dataset.chatId = chatId;
+    notificationItem.style.cursor = 'pointer';
     notificationItem.innerHTML = `
         <img class="notification-icon" src="./icons/user.png" alt="User Icon">
         <div class="notification-content">
@@ -753,6 +755,27 @@ function addBellNotification(senderName, messageText) {
             <span class="notification-message">${messageText}</span>
         </div>
     `;
+
+    // Add click handler to switch to the chat
+    notificationItem.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Switch to the chat
+        switchToChat(chatId);
+        
+        // Remove this notification
+        notificationItem.remove();
+        
+        // Check if there are any notifications left
+        if (bellNotifications.children.length === 0) {
+            // Hide red dot if no notifications
+            const redBall = document.querySelector('.red-ball');
+            if (redBall) {
+                redBall.style.display = 'none';
+            }
+        }
+    });
 
     // Add to the top of the notifications list
     bellNotifications.insertBefore(notificationItem, bellNotifications.firstChild);
@@ -770,6 +793,60 @@ function addBellNotification(senderName, messageText) {
         setTimeout(() => {
             bellWrapper.classList.remove('shake');
         }, 600);
+    }
+}
+
+// Function to switch to a specific chat
+function switchToChat(chatId) {
+    const chatItem = document.querySelector(`.chat-list-item[data-chat-id="${chatId}"]`);
+    if (chatItem) {
+        // Remove active class from all chats
+        document.querySelectorAll('.chat-list-item').forEach(item => {
+            item.classList.remove('active-chat');
+        });
+        
+        // Add active class to selected chat
+        chatItem.classList.add('active-chat');
+        
+        // Update chat header
+        const chatName = chatItem.querySelector('.chat-name').textContent;
+        const chatHeader = document.querySelector('.chat-header');
+        
+        // Create chat header structure if it doesn't exist
+        if (!chatHeader.querySelector('.chat-header-info')) {
+            chatHeader.innerHTML = `
+                <button class="chat-list-toggle-btn">☰</button>
+                <div class="chat-header-info">
+                    <div class="chat-header-name"></div>
+                    <div class="chat-header-participants"></div>
+                </div>
+            `;
+
+            // Re-add event listener for the toggle button
+            const chatListToggleBtn = chatHeader.querySelector('.chat-list-toggle-btn');
+            const chatList = document.querySelector('.chat-list');
+            if (chatListToggleBtn && chatList) {
+                chatListToggleBtn.addEventListener('click', () => toggleChatList(chatList));
+            }
+        }
+        
+        // Update chat name
+        const chatHeaderName = chatHeader.querySelector('.chat-header-name');
+        if (chatHeaderName) {
+            chatHeaderName.textContent = chatName;
+        }
+        
+        // Fetch and update participant status
+        fetchParticipantStatus(chatId);
+        
+        // Load messages for this chat
+        loadChatMessages(chatId);
+        
+        // On mobile, close the chat list
+        const chatList = document.querySelector('.chat-list');
+        if (window.innerWidth <= 768) {
+            closeChatList(chatList);
+        }
     }
 }
 
@@ -816,7 +893,7 @@ function initializeSocket() {
             if (senderId !== currentUserId && currentChatId !== data.chatId) {
                 const senderName = data.sender?.username || data.message.username || 'Someone';
                 const messageText = data.message.message || data.message;
-                addBellNotification(senderName, messageText);
+                addBellNotification(senderName, messageText, data.chatId);
             }
             
             // Only handle messages for the currently selected chat
