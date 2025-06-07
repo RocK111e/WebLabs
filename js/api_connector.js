@@ -462,3 +462,32 @@ export async function create_chat(chatName, userIds) {
         return null;
     }
 }
+
+export async function addMembersToChat(chatId, userIds) {
+    console.log('Calling addMembersToChat with:', { chatId, userIds });
+    try {
+        const response = await fetch(`${node_api_prefix}/chats/${chatId}/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ userIds })
+        });
+
+        console.log('API response status:', response.status);
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('API error response:', errorData);
+            throw new Error(errorData.message || 'Failed to add members');
+        }
+
+        const data = await response.json();
+        console.log('API success response:', data);
+        return data;
+    } catch (error) {
+        console.error('Error in addMembersToChat:', error);
+        throw error;
+    }
+}

@@ -13,6 +13,7 @@ import {
     create_chat,
     fetch_chat_messages,
     send_message as send_message_http,
+    addMembersToChat
 } from "./api_connector.js";
 import ChatSocket from './sockets.js';
 import { 
@@ -167,6 +168,10 @@ async function loadAndDisplayChats() {
                 const chatId = item.dataset.chatId;
                 const participants = JSON.parse(item.dataset.participants || '[]');
                 
+                // Set current chat ID
+                currentChatId = chatId;
+                console.log('Selected chat ID:', currentChatId);
+                
                 // Remove active class from all chat items
                 document.querySelectorAll('.chat-list-item').forEach(i => i.classList.remove('active-chat'));
                 // Add active class to selected chat
@@ -216,12 +221,6 @@ async function loadAndDisplayChats() {
     } else {
         chatListItems.style.display = 'none';
         chatListEmpty.style.display = 'block';
-        
-        // Hide add button when no chat is selected
-        const addButton = document.getElementById('addToChatBtn');
-        if (addButton) {
-            addButton.style.display = 'none';
-        }
     }
 }
 
@@ -986,7 +985,7 @@ async function fetchParticipantStatus(chatId) {
         });
         
         // Update UI with new statuses
-        updateParticipantsWithStatus();
+        await updateParticipantsWithStatus();
         
         return allStudentsCache;
     } catch (error) {
@@ -1055,14 +1054,19 @@ async function updateParticipantsWithStatus(participants = null) {
             };
         });
 
-        chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => `
-            <div class="participant-avatar-wrapper user-${participant.status}" data-participant-id="${participant.id}">
-                <img src="./icons/user.png" 
-                     alt="${participant.name}" 
-                     class="participant-avatar">
-                <div class="tooltip">${participant.name} ${participant.surname}</div>
-            </div>
-        `).join('');
+        // Update the chat header participants
+        chatHeaderParticipants.innerHTML = participantsWithDetails.map(participant => {
+            const fullName = `${participant.name} ${participant.surname}`;
+            return `
+                <div class="participant-avatar-wrapper user-${participant.status}" data-participant-id="${participant.id}">
+                    <img src="./icons/user.png" 
+                         alt="${fullName}" 
+                         class="participant-avatar">
+                    <div class="tooltip">${fullName}</div>
+                </div>
+            `;
+        }).join('');
+
     } catch (error) {
         console.error('Error updating participants:', error);
         chatHeaderParticipants.innerHTML = '';
@@ -1101,20 +1105,68 @@ document.querySelector('#addToChatBtn').addEventListener('click', () => {
     console.log('Add to chat clicked for chat:', currentChatId);
 });
 
-// Add this function to handle adding members to chat
+// Update handleAddMembers function with more debugging
 async function handleAddMembers() {
+    console.log('handleAddMembers called, currentChatId:', currentChatId);
+    
     const confirmButton = document.getElementById('confirmAddMembersBtn');
-    if (!confirmButton || !currentChatId) return;
+    const modal = document.getElementById('addMembersModalOverlay');
+    if (!confirmButton || !currentChatId || !modal) {
+        console.error('Missing required elements:', {
+            confirmButton: !!confirmButton,
+            currentChatId: currentChatId,
+            modal: !!modal
+        });
+        return;
+    }
 
     const memberIds = Array.from(selectedNewMembers);
-    if (memberIds.length === 0) return;
+    console.log('Selected member IDs:', memberIds);
+    
+    if (memberIds.length === 0) {
+        console.error('No members selected');
+        return;
+    }
 
     try {
-        // TODO: Implement the API call to add members
-        console.log('Adding members:', memberIds, 'to chat:', currentChatId);
+        // Show loading state
+        confirmButton.disabled = true;
+        confirmButton.innerHTML = '<span class="loading-spinner"></span> Adding...';
+        
+        // Get current chat members to check for duplicates
+        const currentChat = document.querySelector(`.chat-list-item[data-chat-id="${currentChatId}"]`);
+        const currentMembers = currentChat ? JSON.parse(currentChat.dataset.participants || '[]') : [];
+        console.log('Current members:', currentMembers);
+        
+        // Filter out existing members
+        const newMembers = memberIds.filter(id => !currentMembers.includes(id));
+        console.log('New members to add:', newMembers);
+        
+        if (newMembers.length === 0) {
+            throw new Error('Selected members are already in the chat');
+        }
+
+        // Call API to add members
+        console.log('Calling API to add members to chat:', currentChatId);
+        const updatedChat = await addMembersToChat(currentChatId, newMembers);
+        console.log('API Response:', updatedChat);
+
+        if (!updatedChat || !updatedChat.userIds) {
+            throw new Error('Failed to update chat members');
+        }
+        
+        // Update the chat list item with new participants
+        if (currentChat) {
+            currentChat.dataset.participants = JSON.stringify(updatedChat.userIds);
+            
+            // Update participants display in chat header
+            await updateParticipantsWithStatus(updatedChat.userIds);
+        }
+        
+        // Show success message
+        showNotification('Members added successfully', 'success');
         
         // Close modal and reset selection
-        const modal = document.getElementById('addMembersModalOverlay');
         modal.style.display = 'none';
         selectedNewMembers.clear();
         
@@ -1124,12 +1176,37 @@ async function handleAddMembers() {
             selectedAvatarsContainer.innerHTML = '';
         }
         
-        // Reset the confirm button
-        confirmButton.disabled = true;
     } catch (error) {
         console.error('Error adding members:', error);
-        alert('Failed to add members. Please try again.');
+        showNotification(error.message || 'Failed to add members. Please try again.', 'error');
+    } finally {
+        // Reset button state
+        confirmButton.disabled = false;
+        confirmButton.textContent = 'Add Members';
     }
+}
+
+// Add notification function
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.textContent = message;
+    
+    // Add notification container if it doesn't exist
+    let container = document.querySelector('.notification-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'notification-container';
+        document.body.appendChild(container);
+    }
+    
+    container.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('fade-out');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 // Add this function to update the confirm button state
@@ -1147,6 +1224,7 @@ function addSelectedMemberAvatar(student) {
 
     const avatarElement = document.createElement('div');
     avatarElement.className = 'selected-student-avatar';
+    avatarElement.dataset.studentId = student.id;
     avatarElement.innerHTML = `
         <img src="${student.avatarUrl || './icons/user.png'}" alt="${student.name} ${student.surname}">
         <div class="tooltip">${student.name} ${student.surname}</div>
@@ -1155,49 +1233,56 @@ function addSelectedMemberAvatar(student) {
     selectedAvatarsContainer.appendChild(avatarElement);
 }
 
-// Add this function to display search results in the Add Members modal
+// Update the display function for member search results
 async function displayMemberSearchResults(students) {
     const studentsList = document.getElementById('membersSearchResults');
     if (!studentsList) return;
 
-    if (students.length === 0) {
+    if (!students || students.length === 0) {
         studentsList.innerHTML = '<div class="student-list-item">No students found</div>';
         return;
     }
 
-    studentsList.innerHTML = students.map(student => `
-        <div class="student-list-item ${selectedNewMembers.has(student.id) ? 'selected' : ''}" 
-             data-student-id="${student.id}">
-            <img src="${student.avatarUrl || './icons/user.png'}" alt="${student.name}">
-            <div class="student-info">
-                <div class="student-name">${student.name} ${student.surname}</div>
-                <div class="student-group">${student.group}</div>
+    studentsList.innerHTML = students.map(student => {
+        const isSelected = selectedNewMembers.has(student.id.toString());
+        return `
+            <div class="student-list-item ${isSelected ? 'selected' : ''}" 
+                 data-student-id="${student.id}">
+                <img src="${student.avatarUrl || './icons/user.png'}" alt="${student.name}">
+                <div class="student-info">
+                    <div class="student-name">${student.name} ${student.surname}</div>
+                    <div class="student-group">${student.group}</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Add click handlers
     studentsList.querySelectorAll('.student-list-item').forEach(item => {
         item.addEventListener('click', () => {
             const studentId = item.dataset.studentId;
-            const student = students.find(s => s.id === studentId);
+            const student = students.find(s => s.id.toString() === studentId);
             
             if (!student) return;
 
-            if (selectedNewMembers.has(studentId)) {
+            const studentIdStr = studentId.toString();
+            
+            if (selectedNewMembers.has(studentIdStr)) {
                 // Deselect student
-                selectedNewMembers.delete(studentId);
+                selectedNewMembers.delete(studentIdStr);
                 item.classList.remove('selected');
-                // Remove avatar
-                const avatar = document.querySelector(`#selectedMembersAvatars [data-student-id="${studentId}"]`);
-                if (avatar) avatar.remove();
+                const avatar = document.querySelector(`#selectedMembersAvatars [data-student-id="${studentIdStr}"]`);
+                if (avatar) {
+                    avatar.remove();
+                }
             } else {
                 // Select student
-                selectedNewMembers.add(studentId);
+                selectedNewMembers.add(studentIdStr);
                 item.classList.add('selected');
                 addSelectedMemberAvatar(student);
             }
 
+            console.log('Selected members:', Array.from(selectedNewMembers));
             updateAddMembersConfirmButton();
         });
     });
