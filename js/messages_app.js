@@ -306,13 +306,93 @@ function sendMessage(message, chatId) {
     }
 }
 
+// Function to append a new message to the chat
+function appendMessage(data) {
+    const messagesArea = document.querySelector('.chat-messages-area');
+    if (!messagesArea) return;
+
+    const currentUserId = sessionStorage.getItem('userExternalId')?.toString();
+    const isOwnMessage = data.userId === currentUserId;
+    
+    console.log('Appending message:', {
+        messageUserId: data.userId,
+        currentUserId: currentUserId,
+        isOwnMessage: isOwnMessage
+    });
+    
+    // Create message container with alignment
+    const messageContainer = document.createElement('div');
+    messageContainer.className = `message-container ${isOwnMessage ? 'own-container' : ''}`;
+    messageContainer.style.display = 'flex';
+    messageContainer.style.justifyContent = isOwnMessage ? 'flex-end' : 'flex-start';
+    messageContainer.style.width = '100%';
+    messageContainer.style.marginBottom = '10px';
+    
+    // Create message element
+    const messageElement = document.createElement('div');
+    messageElement.className = isOwnMessage ? 'message own-message' : 'message';
+    messageElement.style.maxWidth = '70%';
+    
+    // Create message content
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    messageContent.textContent = data.message;
+    messageContent.style.backgroundColor = isOwnMessage ? '#6c757d' : '#e9ecef';
+    messageContent.style.color = isOwnMessage ? 'white' : 'black';
+    messageContent.style.padding = '10px 15px';
+    messageContent.style.borderRadius = '15px';
+    messageContent.style.marginBottom = '5px';
+    
+    // Create message info
+    const messageInfo = document.createElement('div');
+    messageInfo.className = 'message-info';
+    messageInfo.style.display = 'flex';
+    messageInfo.style.gap = '8px';
+    messageInfo.style.fontSize = '0.9em';
+    messageInfo.style.justifyContent = isOwnMessage ? 'flex-end' : 'flex-start';
+    
+    const senderName = document.createElement('span');
+    senderName.className = 'message-sender';
+    senderName.textContent = isOwnMessage ? 'You' : data.username;
+    senderName.style.color = 'black';
+    senderName.style.fontWeight = '500';
+    
+    const timestamp = document.createElement('span');
+    timestamp.className = 'message-time';
+    timestamp.textContent = data.timestamp.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    timestamp.style.color = '#6c757d';
+    
+    // Assemble message info based on message ownership
+    if (isOwnMessage) {
+        messageInfo.appendChild(timestamp);
+        messageInfo.appendChild(senderName);
+    } else {
+        messageInfo.appendChild(senderName);
+        messageInfo.appendChild(timestamp);
+    }
+    
+    // Assemble message
+    messageElement.appendChild(messageContent);
+    messageElement.appendChild(messageInfo);
+    messageContainer.appendChild(messageElement);
+    
+    // Add to messages area
+    messagesArea.appendChild(messageContainer);
+    
+    // Scroll to the new message
+    messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
 async function loadChatMessages(chatId) {
     const messagesArea = document.querySelector('.chat-messages-area');
-    const chatHeaderParticipants = document.querySelector('.chat-header-participants');
     if (!messagesArea || !chatId) return;
 
     try {
         const currentUserId = sessionStorage.getItem('userExternalId');
+        console.log('Current user ID:', currentUserId);
         
         // Show loading state
         messagesArea.innerHTML = '<div class="loading-messages">Loading messages...</div>';
@@ -328,19 +408,24 @@ async function loadChatMessages(chatId) {
         
         // Fetch messages
         const messages = await fetch_chat_messages(chatId);
+        console.log('Fetched messages:', messages);
         
         // Clear loading state
         messagesArea.innerHTML = '';
         
         // Display messages
         messages.forEach(msg => {
-            appendMessage({
+            console.log('Processing message:', msg);
+            console.log('Message sender ID:', msg.userId, 'Current user ID:', currentUserId);
+            
+            const messageData = {
                 chatId,
                 message: msg.message,
                 username: msg.username || 'Unknown User',
-                userId: msg.senderExternalId,
+                userId: msg.userId?.toString(),
                 timestamp: new Date(msg.createdAt)
-            });
+            };
+            appendMessage(messageData);
         });
         
         // Scroll to the bottom of messages
@@ -350,50 +435,6 @@ async function loadChatMessages(chatId) {
         console.error('Error loading messages:', error);
         messagesArea.innerHTML = '<div class="error-message">Failed to load messages. Please try again.</div>';
     }
-}
-
-// Function to append a new message to the chat
-function appendMessage(data) {
-    const messagesArea = document.querySelector('.chat-messages-area');
-    if (!messagesArea) return;
-
-    const currentUserId = sessionStorage.getItem('userExternalId');
-    const isOwnMessage = data.userId === currentUserId;
-    
-    const messageElement = document.createElement('div');
-    messageElement.className = `message-item ${isOwnMessage ? 'sent' : 'received'}`;
-    
-    const messageContent = document.createElement('div');
-    messageContent.className = 'message-content';
-    
-    const messageBubble = document.createElement('div');
-    messageBubble.className = 'message-bubble';
-    messageBubble.textContent = data.message;
-    
-    const messageInfo = document.createElement('div');
-    messageInfo.className = 'message-info';
-    
-    const senderName = document.createElement('span');
-    senderName.className = 'message-sender';
-    senderName.textContent = isOwnMessage ? 'You' : data.username;
-    
-    const timestamp = document.createElement('span');
-    timestamp.className = 'message-time';
-    timestamp.textContent = data.timestamp.toLocaleTimeString([], { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
-    
-    messageInfo.appendChild(senderName);
-    messageInfo.appendChild(timestamp);
-    messageContent.appendChild(messageBubble);
-    messageContent.appendChild(messageInfo);
-    messageElement.appendChild(messageContent);
-    
-    messagesArea.appendChild(messageElement);
-    
-    // Scroll to the new message
-    messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
 // Initialize everything when the DOM is loaded
@@ -726,13 +767,12 @@ function initializeSocket() {
                 // Extract message data based on the server's response format
                 const messageData = {
                     chatId: data.chatId,
-                    message: data.message.message || data.message, // Handle both formats
+                    message: data.message.message || data.message,
                     username: data.sender?.username || data.message.username || data.username,
                     userId: data.sender?.userId || data.message.userId || data.userId,
                     timestamp: new Date(data.message.createdAt || Date.now())
                 };
                 
-                // Add the message to the UI
                 appendMessage(messageData);
             }
         });
