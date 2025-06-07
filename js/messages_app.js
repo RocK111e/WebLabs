@@ -438,6 +438,244 @@ async function loadChatMessages(chatId) {
     }
 }
 
+// Function to show "No messages" in bell notifications
+function showNoMessages() {
+    const bellNotifications = document.querySelector('.bell-notifications');
+    if (bellNotifications) {
+        bellNotifications.innerHTML = `
+            <div class="notification-item no-messages" style="cursor: default; color: #666; text-align: center; padding: 10px;">
+                No new messages
+            </div>
+        `;
+    }
+}
+
+// Bell notification functions
+function addBellNotification(senderName, messageText, chatId) {
+    const bellNotifications = document.querySelector('.bell-notifications');
+    if (!bellNotifications) return;
+
+    // Remove "No messages" text if it exists
+    const noMessages = bellNotifications.querySelector('.no-messages');
+    if (noMessages) {
+        noMessages.remove();
+    }
+
+    // Create new notification item
+    const notificationItem = document.createElement('div');
+    notificationItem.className = 'notification-item';
+    notificationItem.dataset.chatId = chatId;
+    notificationItem.style.cursor = 'pointer';
+    notificationItem.innerHTML = `
+        <img class="notification-icon" src="./icons/user.png" alt="User Icon">
+        <div class="notification-content">
+            <span class="notification-name">${senderName}</span>
+            <span class="notification-message">${messageText}</span>
+        </div>
+    `;
+
+    // Add click handler to switch to the chat
+    notificationItem.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Switch to the chat
+        switchToChat(chatId);
+        
+        // Remove this notification
+        notificationItem.remove();
+        
+        // Check if there are any notifications left
+        if (bellNotifications.children.length === 0) {
+            // Hide red dot if no notifications
+            const redBall = document.querySelector('.red-ball');
+            if (redBall) {
+                redBall.style.display = 'none';
+            }
+            // Show "No messages" text
+            showNoMessages();
+        }
+    });
+
+    // Add to the top of the notifications list
+    bellNotifications.insertBefore(notificationItem, bellNotifications.firstChild);
+
+    // Show red dot
+    const redBall = document.querySelector('.red-ball');
+    if (redBall) {
+        redBall.style.display = 'block';
+    }
+
+    // Shake the bell
+    const bellWrapper = document.querySelector('.bell-wrapper');
+    if (bellWrapper && !bellWrapper.classList.contains('shake')) {
+        bellWrapper.classList.add('shake');
+        setTimeout(() => {
+            bellWrapper.classList.remove('shake');
+        }, 600);
+    }
+}
+
+// Function to switch to a specific chat
+function switchToChat(chatId) {
+    const chatItem = document.querySelector(`.chat-list-item[data-chat-id="${chatId}"]`);
+    if (chatItem) {
+        // Remove active class from all chats
+        document.querySelectorAll('.chat-list-item').forEach(item => {
+            item.classList.remove('active-chat');
+        });
+        
+        // Add active class to selected chat
+        chatItem.classList.add('active-chat');
+        
+        // Update chat header
+        const chatName = chatItem.querySelector('.chat-name').textContent;
+        const chatHeader = document.querySelector('.chat-header');
+        
+        // Create chat header structure if it doesn't exist
+        if (!chatHeader.querySelector('.chat-header-info')) {
+            chatHeader.innerHTML = `
+                <button class="chat-list-toggle-btn">☰</button>
+                <div class="chat-header-info">
+                    <div class="chat-header-name"></div>
+                    <div class="chat-header-participants"></div>
+                </div>
+            `;
+
+            // Re-add event listener for the toggle button
+            const chatListToggleBtn = chatHeader.querySelector('.chat-list-toggle-btn');
+            const chatList = document.querySelector('.chat-list');
+            if (chatListToggleBtn && chatList) {
+                chatListToggleBtn.addEventListener('click', () => toggleChatList(chatList));
+            }
+        }
+        
+        // Update chat name
+        const chatHeaderName = chatHeader.querySelector('.chat-header-name');
+        if (chatHeaderName) {
+            chatHeaderName.textContent = chatName;
+        }
+        
+        // Fetch and update participant status
+        fetchParticipantStatus(chatId);
+        
+        // Load messages for this chat
+        loadChatMessages(chatId);
+        
+        // On mobile, close the chat list
+        const chatList = document.querySelector('.chat-list');
+        if (window.innerWidth <= 768) {
+            closeChatList(chatList);
+        }
+    }
+}
+
+// Initialize socket connection without notification support
+function initializeSocket() {
+    const userExternalId = sessionStorage.getItem('userExternalId');
+    const username = sessionStorage.getItem('userDisplayName');
+    
+    console.log('Initializing socket with:', { userExternalId, username });
+    
+    if (!userExternalId) {
+        console.error('User ID not found in session storage');
+        return;
+    }
+
+    try {
+        console.log('Creating new ChatSocket instance');
+        chatSocket = new ChatSocket();
+        
+        // Add connection state change listener
+        chatSocket.socket?.on('connect', () => {
+            console.log('Socket connected successfully');
+        });
+        
+        chatSocket.socket?.on('disconnect', () => {
+            console.log('Socket disconnected');
+        });
+        
+        chatSocket.socket?.on('error', (error) => {
+            console.error('Socket error:', error);
+        });
+        
+        console.log('Connecting user to socket');
+        chatSocket.connectUser(userExternalId, username);
+        
+        // Set up message listener with bell notification
+        chatSocket.onNewMessage((data) => {
+            console.log('New message received:', data);
+            const currentChatId = getCurrentChatId();
+            const currentUserId = sessionStorage.getItem('userExternalId');
+            const senderId = data.sender?.userId || data.message.userId;
+            
+            // Don't show notification for own messages or if user is in the same chat
+            if (senderId !== currentUserId && currentChatId !== data.chatId) {
+                const senderName = data.sender?.username || data.message.username || 'Someone';
+                const messageText = data.message.message || data.message;
+                addBellNotification(senderName, messageText, data.chatId);
+            }
+            
+            // Only handle messages for the currently selected chat
+            if (currentChatId === data.chatId) {
+                // Extract message data based on the server's response format
+                const messageData = {
+                    chatId: data.chatId,
+                    message: data.message.message || data.message,
+                    username: data.sender?.username || data.message.username || data.username,
+                    userId: data.sender?.userId || data.message.userId || data.userId,
+                    timestamp: new Date(data.message.createdAt || Date.now())
+                };
+                
+                appendMessage(messageData);
+            }
+        });
+
+        // Set up user status listener
+        chatSocket.onUserStatus((data) => {
+            const userId = data.userId.toString();
+            const isOnline = data.status === 'online';
+            
+            // Don't update status if it's the current user (they're always online)
+            if (userId !== userExternalId) {
+                // Update status map and UI
+                statusMap = updateStatusInMap(statusMap, userId, isOnline);
+                updateParticipantStatusUI(userId);
+            }
+        });
+
+        // Initialize status data
+        initializeStatusData();
+        
+        console.log('Socket initialization completed');
+    } catch (error) {
+        console.error('Error during socket initialization:', error);
+    }
+}
+
+// Initialize status data
+async function initializeStatusData() {
+    const students = await fetch_all_students();
+    if (students) {
+        statusMap = processStatusData(students);
+        console.log('Initialized status map:', statusMap);
+    }
+}
+
+// Update single participant status in UI
+function updateParticipantStatusUI(userId) {
+    userId = userId.toString();
+    const isOnline = isUserOnline(statusMap, userId);
+    
+    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
+    if (participantElement) {
+        // Remove existing status classes
+        participantElement.classList.remove('user-online', 'user-offline');
+        // Add new status class
+        participantElement.classList.add(`user-${isOnline ? 'online' : 'offline'}`);
+    }
+}
+
 // Initialize everything when the DOM is loaded
 document.addEventListener("DOMContentLoaded", async function() {
     const currentPagePath = window.location.pathname.split("/").pop() || "index.html";
@@ -462,10 +700,11 @@ document.addEventListener("DOMContentLoaded", async function() {
         redBall.style.display = 'none';
     }
 
-    // Clear existing notifications
+    // Clear existing notifications and show "No messages"
     const bellNotifications = document.querySelector('.bell-notifications');
     if (bellNotifications) {
         bellNotifications.innerHTML = '';
+        showNoMessages();
     }
 
     const bellContainer = document.querySelector('.bell-container');
@@ -735,223 +974,5 @@ async function updateParticipantsWithStatus(participants = null) {
     } catch (error) {
         console.error('Error updating participants:', error);
         chatHeaderParticipants.innerHTML = '';
-    }
-}
-
-// Bell notification functions
-function addBellNotification(senderName, messageText, chatId) {
-    const bellNotifications = document.querySelector('.bell-notifications');
-    if (!bellNotifications) return;
-
-    // Create new notification item
-    const notificationItem = document.createElement('div');
-    notificationItem.className = 'notification-item';
-    notificationItem.dataset.chatId = chatId;
-    notificationItem.style.cursor = 'pointer';
-    notificationItem.innerHTML = `
-        <img class="notification-icon" src="./icons/user.png" alt="User Icon">
-        <div class="notification-content">
-            <span class="notification-name">${senderName}</span>
-            <span class="notification-message">${messageText}</span>
-        </div>
-    `;
-
-    // Add click handler to switch to the chat
-    notificationItem.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Switch to the chat
-        switchToChat(chatId);
-        
-        // Remove this notification
-        notificationItem.remove();
-        
-        // Check if there are any notifications left
-        if (bellNotifications.children.length === 0) {
-            // Hide red dot if no notifications
-            const redBall = document.querySelector('.red-ball');
-            if (redBall) {
-                redBall.style.display = 'none';
-            }
-        }
-    });
-
-    // Add to the top of the notifications list
-    bellNotifications.insertBefore(notificationItem, bellNotifications.firstChild);
-
-    // Show red dot
-    const redBall = document.querySelector('.red-ball');
-    if (redBall) {
-        redBall.style.display = 'block';
-    }
-
-    // Shake the bell
-    const bellWrapper = document.querySelector('.bell-wrapper');
-    if (bellWrapper && !bellWrapper.classList.contains('shake')) {
-        bellWrapper.classList.add('shake');
-        setTimeout(() => {
-            bellWrapper.classList.remove('shake');
-        }, 600);
-    }
-}
-
-// Function to switch to a specific chat
-function switchToChat(chatId) {
-    const chatItem = document.querySelector(`.chat-list-item[data-chat-id="${chatId}"]`);
-    if (chatItem) {
-        // Remove active class from all chats
-        document.querySelectorAll('.chat-list-item').forEach(item => {
-            item.classList.remove('active-chat');
-        });
-        
-        // Add active class to selected chat
-        chatItem.classList.add('active-chat');
-        
-        // Update chat header
-        const chatName = chatItem.querySelector('.chat-name').textContent;
-        const chatHeader = document.querySelector('.chat-header');
-        
-        // Create chat header structure if it doesn't exist
-        if (!chatHeader.querySelector('.chat-header-info')) {
-            chatHeader.innerHTML = `
-                <button class="chat-list-toggle-btn">☰</button>
-                <div class="chat-header-info">
-                    <div class="chat-header-name"></div>
-                    <div class="chat-header-participants"></div>
-                </div>
-            `;
-
-            // Re-add event listener for the toggle button
-            const chatListToggleBtn = chatHeader.querySelector('.chat-list-toggle-btn');
-            const chatList = document.querySelector('.chat-list');
-            if (chatListToggleBtn && chatList) {
-                chatListToggleBtn.addEventListener('click', () => toggleChatList(chatList));
-            }
-        }
-        
-        // Update chat name
-        const chatHeaderName = chatHeader.querySelector('.chat-header-name');
-        if (chatHeaderName) {
-            chatHeaderName.textContent = chatName;
-        }
-        
-        // Fetch and update participant status
-        fetchParticipantStatus(chatId);
-        
-        // Load messages for this chat
-        loadChatMessages(chatId);
-        
-        // On mobile, close the chat list
-        const chatList = document.querySelector('.chat-list');
-        if (window.innerWidth <= 768) {
-            closeChatList(chatList);
-        }
-    }
-}
-
-// Initialize socket connection without notification support
-function initializeSocket() {
-    const userExternalId = sessionStorage.getItem('userExternalId');
-    const username = sessionStorage.getItem('userDisplayName');
-    
-    console.log('Initializing socket with:', { userExternalId, username });
-    
-    if (!userExternalId) {
-        console.error('User ID not found in session storage');
-        return;
-    }
-
-    try {
-        console.log('Creating new ChatSocket instance');
-        chatSocket = new ChatSocket();
-        
-        // Add connection state change listener
-        chatSocket.socket?.on('connect', () => {
-            console.log('Socket connected successfully');
-        });
-        
-        chatSocket.socket?.on('disconnect', () => {
-            console.log('Socket disconnected');
-        });
-        
-        chatSocket.socket?.on('error', (error) => {
-            console.error('Socket error:', error);
-        });
-        
-        console.log('Connecting user to socket');
-        chatSocket.connectUser(userExternalId, username);
-        
-        // Set up message listener with bell notification
-        chatSocket.onNewMessage((data) => {
-            console.log('New message received:', data);
-            const currentChatId = getCurrentChatId();
-            const currentUserId = sessionStorage.getItem('userExternalId');
-            const senderId = data.sender?.userId || data.message.userId;
-            
-            // Don't show notification for own messages or if user is in the same chat
-            if (senderId !== currentUserId && currentChatId !== data.chatId) {
-                const senderName = data.sender?.username || data.message.username || 'Someone';
-                const messageText = data.message.message || data.message;
-                addBellNotification(senderName, messageText, data.chatId);
-            }
-            
-            // Only handle messages for the currently selected chat
-            if (currentChatId === data.chatId) {
-                // Extract message data based on the server's response format
-                const messageData = {
-                    chatId: data.chatId,
-                    message: data.message.message || data.message,
-                    username: data.sender?.username || data.message.username || data.username,
-                    userId: data.sender?.userId || data.message.userId || data.userId,
-                    timestamp: new Date(data.message.createdAt || Date.now())
-                };
-                
-                appendMessage(messageData);
-            }
-        });
-
-        // Set up user status listener
-        chatSocket.onUserStatus((data) => {
-            const userId = data.userId.toString();
-            const isOnline = data.status === 'online';
-            
-            // Don't update status if it's the current user (they're always online)
-            if (userId !== userExternalId) {
-                // Update status map and UI
-                statusMap = updateStatusInMap(statusMap, userId, isOnline);
-                updateParticipantStatusUI(userId);
-            }
-        });
-
-        // Initialize status data
-        initializeStatusData();
-        
-        console.log('Socket initialization completed');
-    } catch (error) {
-        console.error('Error during socket initialization:', error);
-    }
-}
-
-// Initialize status data
-async function initializeStatusData() {
-    const students = await fetch_all_students();
-    if (students) {
-        statusMap = processStatusData(students);
-        console.log('Initialized status map:', statusMap);
-    }
-}
-
-// Update single participant status in UI
-function updateParticipantStatusUI(userId) {
-    userId = userId.toString();
-    const isOnline = isUserOnline(statusMap, userId);
-    
-    const participantElement = document.querySelector(`[data-participant-id="${userId}"]`);
-    if (participantElement) {
-        // Remove existing status classes
-        participantElement.classList.remove('user-online', 'user-offline');
-        // Add new status class
-        participantElement.classList.add(`user-${isOnline ? 'online' : 'offline'}`);
     }
 }
